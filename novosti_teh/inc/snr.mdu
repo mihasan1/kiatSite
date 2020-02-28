@@ -1,0 +1,291 @@
+<?PHP
+include_once("{$cutepath}/inc/langdate.php");
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Main Screen of SNR
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+if($action == "" or !isset($action)){
+    echoheader("options", "Поиск и замена");
+    echo'<script language="JavaScript" type="text/javascript">
+<!--
+onload=startup;function startup(){
+    ckeck_uncheck_tree("news");
+    ckeck_uncheck_tree("comments");
+}
+
+function ckeck_uncheck_tree(tree) {
+    var myform = document.snr;
+    if(tree == "news"){
+        if(myform.snr_search_in_news.checked == false){
+            myform.snr_include_title.disabled = true;
+            myform.snr_include_short.disabled = true;
+            myform.snr_include_full.disabled = true;
+            myform.snr_include_avatar.disabled = true;
+        }else{
+            myform.snr_include_title.disabled = false;
+            myform.snr_include_short.disabled = false;
+            myform.snr_include_full.disabled = false;
+            myform.snr_include_avatar.disabled = false;
+        }
+    }
+    if(tree == "comments"){
+        if(myform.snr_search_in_comments.checked == false){
+            myform.snr_include_name.disabled = true;
+            myform.snr_include_comment.disabled = true;
+        }else{
+            myform.snr_include_name.disabled = false;
+            myform.snr_include_comment.disabled = false;
+        }
+    }
+
+}
+
+function ckeck_uncheck_all() {
+    var frm = document.snr;
+    for (var i=0;i<frm.elements.length;i++) {
+        var elmnt = frm.elements[i];
+        if (elmnt.name=="snr_sources[]") {
+            if(frm.master_box.checked != true){ elmnt.checked=false; }
+            else{ elmnt.checked=true; }
+        }
+    }
+}
+
+-->
+</script>
+    <table border=0 cellpading=0 cellspacing=0 width=654>
+    <form method=POST name=snr action="'.$PHP_SELF.'?mod=snr">
+    <tr>
+    <td width=654>
+  <table border="0" width="657"  cellspacing="0" cellpadding="0" height="100%" >
+    <tr>
+      <td valign="bottom" width="311" valign="top" height="1">
+
+      <b>Где искать?</b>
+
+      </td>
+      <td width="5" valign="top"  rowspan="2" height="100%">
+      </td>
+      <td valign="bottom" width="330" height="1"><b>Настройки:</b></td>
+    </tr>
+
+    <tr>
+      <td width="311" valign="top" height="100%" >
+
+  <table class="panel" cellspacing="0" cellpadding="2" width="311" height="100%">
+    <tr>
+      <td >&nbsp;<input checked type="checkbox" style="border:0; background-color:transparent"  name="snr_sources[]" value="active" id="active">
+      <label for="active">Новости и комментарии</label>
+      </td>
+    </tr>';
+
+    if(!$handle = opendir("./data/archives")){ echo("<center>Невозможно открыть папку $cutepath/data/archives "); }
+           while (false !== ($file = readdir($handle)))
+           {
+               if($file != "." and $file != ".." and !is_dir("./data/archives/$file") and eregi("news.arch", $file))
+            {
+
+                $file_arr = explode(".", $file);
+                $id          = $file_arr[0];
+
+                $news_lines = file("./data/archives/$file");
+                $creation_date = langdate("j M Y",$file_arr[0]);
+                $count = count($news_lines);
+                $last = $count-1;
+                $first_news_arr = explode("|", $news_lines[$last]);
+                $last_news_arr    = explode("|", $news_lines[0]);
+
+                $first_timestamp = $first_news_arr[0];
+                $last_timestamp     = $last_news_arr[0];
+
+                $duration = (langdate("j M Y",$first_timestamp) ." - ". langdate("j M Y",$last_timestamp) );
+                echo "
+                <tr>
+                  <td >&nbsp;<input type='checkbox' style='border:0; background-color:transparent'  name=\"snr_sources[]\" value=\"$id\" id='$id'>
+                  <label for='$id'>Архив: $duration</label>
+                  </td>
+                </tr>
+                ";
+               }
+           }
+    closedir($handle);
+
+
+    echo'<tr>
+      <td ><br>&nbsp;<input type=checkbox name="master_box" style="border:0; background-color:transparent;" onclick="javascript:ckeck_uncheck_all()" id="all"> <label for="all">Выбрать/снять все</label>
+      </td>
+    </tr>
+    <tr>
+      <td height="100%" >
+      </td>
+    </tr>
+  </table>
+
+      </td>
+      <td width="330" height="1" valign="top" >
+  <table class="panel" cellspacing="3" cellpadding="0" width="330">
+    <tr>
+      <td valign="top" width="318" colspan="2"><input type="checkbox" onclick="javascript:ckeck_uncheck_tree(\'news\')" style="border:0; background-color:transparent"  name="snr_search_in_news" value="1" checked id="snr_search_in_news"> <label for="snr_search_in_news">Поиск в новостях</label></td>
+    </tr>
+    <tr>
+      <td valign="top" width="20"></td>
+      <td valign="top" width="296"><input type="checkbox" style="border:0; background-color:transparent"  name="snr_include_title" value="1" checked id="snr_include_title"> <label for="snr_include_title">включая заголовки</label></td>
+    </tr>
+    <tr>
+      <td valign="top" width="20"></td>
+      <td valign="top" width="296"><input type="checkbox" style="border:0; background-color:transparent"  name="snr_include_short" value="1" checked id="snr_include_short"> <label for="snr_include_short">включая краткое содержание</label></td>
+    </tr>
+    <tr>
+      <td valign="top" width="20"></td>
+      <td valign="top" width="296"><input type="checkbox" style="border:0; background-color:transparent"  name="snr_include_full" value="1" checked id="snr_include_full"> <label for="snr_include_full">включая статью целиком</label></td>
+    </tr>
+    <tr>
+      <td valign="top" width="20"></td>
+      <td valign="top" width="296"><input type="checkbox" style="border:0; background-color:transparent"  name="snr_include_avatar" value="1" id="snr_include_avatar"> <label for="snr_include_avatar">включая аватары</label></td>
+    </tr>
+    <tr>
+      <td valign="top" width="318" colspan="2"><input type="checkbox" style="border:0; background-color:transparent" onclick="javascript:ckeck_uncheck_tree(\'comments\')" name="snr_search_in_comments" value="1" id="snr_search_in_comments"> <label for="snr_search_in_comments">Поиск в комментариях</label></td>
+    </tr>
+    <tr>
+      <td valign="top" width="20"></td>
+      <td valign="top" width="296"><input type="checkbox" style="border:0; background-color:transparent"  name="snr_include_name" value="1" checked id="snr_include_name"> <label for="snr_include_name">включая имя</label></td>
+    </tr>
+    <tr>
+      <td valign="top" width="20"></td>
+      <td valign="top" width="296"><input type="checkbox" style="border:0; background-color:transparent"  name="snr_include_comment" value="1" checked id="snr_include_comment"> <label for="snr_include_comment">включая текст комментария</label></td>
+    </tr>
+  </table>
+      </td>
+    </tr>
+  </table>
+    </tr>
+
+    <tr>
+    <td width=650>
+    <img height=15 border=0 src="skins/images/blank.gif" width=0><br>
+    <b>Поиск и замена:</b>
+    </tr>
+
+    <tr>
+    <td width=650>
+    </tr>
+    <tr>
+    <td width=637 >
+  <table class="panel" cellspacing="0" cellpadding="10" width="651">
+  <tr>
+      <td width="643" >&nbsp;&nbsp;Искать текст:<br>
+        &nbsp;
+        <textarea rows="5" cols="95" name="snr_search_text"></textarea></td>
+  </tr>
+    <tr>
+      <td width="643" >&nbsp;&nbsp;Заменить на:<br>
+        &nbsp;
+        <textarea rows="5" cols="95" name="snr_replace_text"></textarea></td>
+    </tr>
+  </table>
+    </tr>
+
+    <tr>
+    <td width=637 >
+  <table cellspacing="0" cellpadding="5" width="651">
+    <tr>
+
+      <td width="411" >
+        <p align=right>&nbsp;<br>Перед началом замены текста рекомендуется<br> сделать <a href="'.$PHP_SELF.'?mod=tools&amp;action=backup" target="_blank">резервную копию</a> Ваших новостей&nbsp;&nbsp;<br>
+        <a onClick="javascript:Help(\'snr\')" href="#">Как пользоваться модулем "Поиск и замена"</a>?</p>
+      </td>
+
+      <td width="218" >
+        <p align="right"><br>
+        <input type=submit value=" Заменить ">&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    </tr>
+  </table>
+    </tr>
+    <input type="hidden" name="action" value="doreplace">
+   </form></table>';
+
+    echofooter();
+}elseif($action == "doreplace"){
+
+    if( !isset($snr_search_in_news) and !isset($snr_search_in_comments) ){ msg("error", "Ошибка!!!", "Вы должны выбрать, где заменять текст: в новостях и/или комментариях!"); }
+    elseif( !isset($snr_sources) ){ msg("error", "Ошибка!!!", "Вы должны выбрать, где заменять текст!"); }
+    elseif( !isset($snr_search_text) or $snr_search_text == ''){ msg("error", "Ошибка!!!", "Вы должны ввести текст для поиска и замены!"); }
+
+    $snr_sources[] = 'fake';
+    foreach($snr_sources as $source){
+
+        if($source == 'fake') continue;
+        if($source == "active"){ $news_file = "./data/news.txt"; $comm_file = "./data/comments.txt"; }
+        else{ $news_file = "./data/archives/${source}.news.arch"; $comm_file = "./data/archives/${source}.comments.arch"; }
+
+
+        //----------------------------------
+        // Search in the News
+        //----------------------------------
+        if( isset($snr_search_in_news) ){
+
+            $all_news_arr    = file("$news_file");
+            $new_db         = fopen("$news_file", w);
+            foreach($all_news_arr as $news_line){
+                $news_arr = explode("|", $news_line);
+
+                if( isset($snr_include_title) ){
+                    $news_arr[2] = preg_replace("'$snr_search_text'", "$snr_replace_text", $news_arr[2]);
+                }
+                if( isset($snr_include_short) ){
+                    $news_arr[3] = preg_replace("'$snr_search_text'", "$snr_replace_text", $news_arr[3]);
+                }
+                if( isset($snr_include_full) ){
+                    $news_arr[4] = preg_replace("'$snr_search_text'", "$snr_replace_text", $news_arr[4]);
+                }
+
+                if( isset($snr_include_avatar) ){
+                	$news_arr[5] = preg_replace("'$snr_search_text'", "$snr_replace_text", $news_arr[5]);
+                }
+
+                $new_news_line = "$news_arr[0]|$news_arr[1]|$news_arr[2]|$news_arr[3]|$news_arr[4]|$news_arr[5]|$news_arr[6]||\n";
+                fwrite($new_db, $new_news_line);
+
+            }
+            fclose($new_db);
+        }
+        //----------------------------------
+        // Search in the Comments
+        //----------------------------------
+        if( isset($snr_search_in_comments) ){
+
+        $old_com = file("$comm_file");
+        $new_com = fopen("$comm_file","w");
+
+        foreach($old_com as $line)
+        {
+            $line_arr = explode("|>|",$line);
+            fwrite($new_com,"$line_arr[0]|>|");
+
+            $comments = explode("||", $line_arr[1]);
+            foreach($comments as $single_comment)
+            {
+                $single_comment = trim($single_comment);
+                $comment_arr = explode("|", $single_comment);
+
+                if(isset($comment_arr[0]) and $comment_arr[0] != ''){
+
+                if( isset($snr_include_name) ){
+                    $comment_arr[1] = preg_replace("'$snr_search_text'", "$snr_replace_text", $comment_arr[1]);
+                }
+                if( isset($snr_include_comment) ){
+                    $comment_arr[4] = preg_replace("'$snr_search_text'", "$snr_replace_text", $comment_arr[4]);
+                }
+
+                fwrite($new_com, "$comment_arr[0]|$comment_arr[1]|$comment_arr[2]|$comment_arr[3]|$comment_arr[4]||");
+                }
+            }
+            fwrite($new_com,"\n");
+        }
+
+        }
+    }
+
+    msg("info", "Замена...", "Процесс поиска и замены завершен!");
+
+}
+?>

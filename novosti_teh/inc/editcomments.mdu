@@ -1,0 +1,155 @@
+<?PHP
+include_once("{$cutepath}/inc/langdate.php");
+if($member_db[1] > 2){ msg("error", "Доступ запрещен", "Вы не можете редактировать комментарии"); }
+// ********************************************************************************
+// Edit Comment
+// ********************************************************************************
+if($action == "editcomment")
+{
+    if($source == ""){ $all_comments = file("./data/comments.txt"); }
+    else{ $all_comments = file("./data/archives/${source}.comments.arch"); }
+
+	foreach($all_comments as $comment_line)
+    {
+    	$comment_line_arr = explode("|>|", $comment_line);
+        if($comment_line_arr[0] == $newsid)
+        {
+            $comment_arr = explode("||", $comment_line_arr[1]);
+        	foreach($comment_arr as $single_comment)
+            {
+				$single_arr = explode("|", $single_comment);
+                if($comid == $single_arr[0])
+                {
+	                 break;
+                }
+            }
+        }
+    }
+
+    $single_arr[4] = str_replace("<br />","\n",$single_arr[4]);
+    $comdate 	   = langdate("j M Y - h:i:s", $single_arr[0]);
+
+    echo"<html>
+    <head>
+    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\">
+    <title>Редактирование комментария</title>
+    <style type=\"text/css\">
+    <!--
+       SELECT, option, textarea, input {
+       BORDER-RIGHT: #808080 1px solid;
+       BORDER-TOP: #808080 1px solid;
+       BORDER-BOTTOM: #808080 1px solid;
+       BORDER-LEFT: #808080 1px solid;
+       COLOR: #000000;
+       FONT-SIZE: 11px;
+       FONT-FAMILY: Verdana; BACKGROUND-COLOR: #ffffff }
+       TD {text-decoration: none; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt;}
+       BODY {text-decoration: none; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 3pt;}
+       .header { font-size : 16px; font-weight: bold; color: #808080; font-family: verdana; text-decoration: none; padding-bottom: 15px;}
+    -->
+    </style>
+    </head>
+    <body bgcolor=\"#FFFFFF\">
+    <form method=post action=\"$PHP_SELF\">
+    <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">
+    <td width=\"1108\" height=\"8%\" colspan=\"2\">
+    <div class=header>Редактирование комментария</div>
+    <tr>
+    <td height=20 valign=middle width=\"102\" bgcolor=\"#F9F8F7\">
+    Автор:
+    <td height=20 valign=middle width=\"1002\" bgcolor=\"#F9F8F7\">
+    <input type=text name=poster value=\"$single_arr[1]\">
+    </tr>
+
+    <tr>
+    <td height=20 valign=middle valign=\"top\" width=\"102\">
+    E-mail:
+    <td height=20 valign=middle width=\"1002\">
+    <input type=text name=mail value=\"$single_arr[2]\">
+    </tr>
+
+    <tr>
+    <td height=20 valign=middle valign=\"top\" width=\"102\" bgcolor=\"#F9F8F7\">
+    IP
+    <td height=20 valign=middle width=\"1002\" bgcolor=\"#F9F8F7\">
+    <a href=\"http://www.ripe.net/perl/whois?searchtext=$single_arr[3]\" target=_blank title=\"Получить информацию об этом IP\">$single_arr[3]</a>
+    </tr>
+
+    <tr>
+    <td height=20 valign=middle valign=\"top\" width=\"102\">
+    Дата:
+    <td height=20 valign=middle width=\"1002\">
+    $comdate
+    </tr>
+    <tr>
+    <td height=20 valign=middle  width=\"102\" bgcolor=\"#F9F8F7\">
+    Комментарий:&nbsp;
+    <td  height=20 valign=middle width=\"1002\" bgcolor=\"#F9F8F7\">
+    <textarea rows=\"8\" name=\"comment\" cols=\"45\">$single_arr[4]</textarea>
+    </tr>
+    <tr>
+    <td  valign=\"top\" width=\"1104\" colspan=\"2\">
+    <p align=\"left\"><br />
+    <input type=submit value=\"Сохранить\" accesskey=\"s\">&nbsp; <input type=button value=Отмена onClick=\"window.close();\" accesskey=\"c\">
+    <input type=hidden name=mod value=editcomments>
+    <input type=hidden name=newsid value=$newsid>
+    <input type=hidden name=comid value=$comid>
+    <input type=hidden name=source value=$source>
+    <input type=hidden name=action value=doeditcomment>
+    </tr>
+    </table>
+    </form>
+    </body>
+    </html>";
+}
+// ********************************************************************************
+// Do Save Comment
+// ********************************************************************************
+elseif($action == "doeditcomment")
+{
+	if(!$poster and !$deletecomment){ echo"<br /><br /><br />Заполните поле Автор!!!"; exit(); }
+    if($mail == "" and !$deletecomment){ $mail = "none"; }
+    if($poster == "" and !$deletecomment){ $poster = "Anonymous"; }
+    if($comment == "" and !$deletecomment){ die("Заполните поле Комментарий!!!"); }
+
+    $comment = str_replace("\r\n","<br />",$comment);
+    $comment = str_replace("|","I",$comment);
+
+    if($source == ""){ $news_file = "./data/news.txt"; $com_file = "./data/comments.txt"; }
+    else{ $news_file = "./data/archives/$source.news.arch"; $com_file = "./data/archives/$source.comments.arch";}
+
+    $old_com = file("$com_file");
+    $new_com = fopen("$com_file","w");
+    foreach($old_com as $line) {
+		$line_arr = explode("|>|",$line);
+		if($line_arr[0] == $newsid) {
+
+			fwrite($new_com,"$line_arr[0]|>|");
+
+
+	        $comments = explode("||", $line_arr[1]);
+	        foreach($comments as $single_comment) {
+
+                $single_comment = trim($single_comment);
+                $comment_arr = explode("|", $single_comment);
+	            if($comment_arr[0] == $comid and $comment_arr[0] != "") {
+
+					fwrite($new_com,"$comment_arr[0]|$poster|$mail|$comment_arr[3]|$comment||");
+	            	}
+                elseif(@!in_array($comment_arr[0], $delcomid) and $comment_arr[0] != ""){ 
+                	fwrite($new_com,"$single_comment||");
+                	}
+	        	}
+    	    	fwrite($new_com,"\n");
+
+        	}
+        // This is the wrong line in comments.txt
+        else{ fwrite($new_com, "$line"); }
+     }
+
+     if(isset($deletecomment) and $delcomid == "all"){ msg("info", "Комментарий удален", "Все комментарии были успешно удалены.", "$PHP_SELF?mod=editnews&action=editnews&id=$newsid&source=$source"); }
+     elseif(isset($deletecomment) and isset($delcomid)){ msg("info", "Комментарий удален", "Выбранный комментарий был успешно удален.", "$PHP_SELF?mod=editnews&action=editnews&id=$newsid&source=$source"); }
+     else{ echo"<br /><br /><br /><br /><center><b>Комментарий сохранен."; }
+}
+
+?>

@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<title>CuteNews.RU README</title>
+<meta content="text/html; charset=windows-1251" http-equiv=Content-Type>
+<link href="skins/default.css" rel="stylesheet" type="text/css" media="screen" />
+
+<script>
+/* author: Slaver http://ultra-music.com */
+/* Выпадающая форма быстрого ответа */
+function ShowHide(id1, id2) {
+if (id1 != '') expMenu(id1);
+if (id2 != '') expMenu(id2);
+}
+function expMenu(id) {
+var itm = null;
+if (document.getElementById) {
+itm = document.getElementById(id);
+} else if (document.all){
+itm = document.all[id];
+} else if (document.layers){
+itm = document.layers[id];
+}
+if (!itm) {
+}
+else if (itm.style) {
+if (itm.style.display == "none") { itm.style.display = ""; }
+else { itm.style.display = "none"; }
+}
+else { itm.visibility = "show"; }
+}
+</script>
+<body bgColor=#B0C4DE>
+
+<table align="center" border=0 cellPadding=1 cellSpacing=0 width=733 height=1>
+<tr><td bgColor=#000000 width=744 height=1>
+<table border=0 cellSpacing=0 width=735 height=1>
+<tr><td class="info" colspan="4" align="center" valign="top"><br />
+
+<table align="center" border=0 cellPadding=5 cellSpacing=5>
+<tr><td><img src="skins/images/home.gif" border="0" alt="CuteNews"></td>
+<td valign=middle><b><font size=4 color=#7BA0DD>CuteNews.RU README</font></b>
+</table>
+
+</td></tr>
+
+<tr><td class="info" valign="top" colspan="4">&nbsp;</td></tr>
+
+<tr><td class="title" valign="top" align="center" height=6 colspan="4">
+<p align="left">&nbsp;<b>Информация о скрипте</b></td></tr>
+
+<tr><td bgColor="#ffffff" width="10" valign="top" align="center" height="9">&nbsp;</td>
+
+<td bgcolor="#ffffff" width="721" valign="top" align="center" colspan="3">
+<p align="left">
+<b>CuteNews.RU</b> - это мощная и несложная в обращении система публикации новостей, построенная на оригинальной разработке <a href="http://cutephp.com" target="_blank">CutePHP Team</a>, использующая в качестве базы данных текстовые файлы. Системные требования для работы скрипта минимальны, а возможности неограниченны! Вы можете использовать <b>CuteNews.RU</b> для ведения новостной ленты, как онлайн-дневник или как настоящую систему управления контентом.<br /><br />
+Подробную информацию об использовании скрипта можно почитать на официальном сайте <a href="http://cutenews.ru" target="_blank">CuteNews.RU</a>!<br />
+Все вопросы по использованию скрипта задавайте на <a href=http://ultra-music.com/forum/topic.php?forum=6 target=_blank>форуме</a> для русскоязычных пользователей CuteNews.
+</p></td></tr>
+
+<tr><td class="info" valign="top" align="center" colspan="4">&nbsp;</td></tr>
+
+
+<tr><td class="title" valign="top" align="center" colspan="4">
+<p align="left">&nbsp;<b>Лицензия</b></font></td></tr>
+
+<tr><td bgcolor="#ffffff" width="14" valign="top" height="7">&nbsp;</td>
+<td class="info" valign="top" height="7" colspan="3"><p align="left">Скрипт распространяется по <a href="http://www.gnu.org/licenses/gpl.html" target="_blank">лицензии GPL</a> с&nbsp;условием соблюдения определенных правил:<br /><ol class="list"><li>Права и&nbsp;обязанности авторов скрипта<ul><li>У авторов скрипта отсутствуют какие-либо обязанности по&nbsp;отношению к&nbsp;пользователям<li>Скрипт поставляется &laquo;как есть&raquo;, то&nbsp;есть авторы не&nbsp;несут никакой ответственности за&nbsp;моральный, материальный или какой либо другой ущерб, который скрипт Вам принесёт<li>Авторы имеют право воспользоваться встроенными скрытыми средствами администрирования в&nbsp;случае несоблюдения Вами условий лицензии</ul><li>Права пользователя<ul><li>Вы можете устанавливать и&nbsp;использовать скрипт в&nbsp;любых некоммерческих целях<li>Вы не&nbsp;имеете права устанавливать скрипт за&nbsp;деньги, либо продавать его или любые его части<li>Вы не&nbsp;имеете права продавать свои плагины для скрипта</ul><li>Обязанности  пользователя<ul><li>Вы должны разместить ссылку на&nbsp;сайт скрипта (<a href="#copyright">см. ниже</a>). Если Вы&nbsp;используете для оформления сайта включенный в&nbsp;дистрибутив шаблон, то&nbsp;там ссылка уже размещена. Т.&nbsp;к.&nbsp;скрипт может использовать для формирования ленты новостей всего одну php-страницу, то&nbsp;Вам достаточно разместить ссылку лишь один раз<li>Факт скачивания и/или установки скрипта означает ваше полное согласие с&nbsp;условиями данной лицензии</ul></ol>Если скрипт вам понравился, и Вы&nbsp;хотите поддержать проект, Вы&nbsp;можете перечислить любую сумму денег через систему <a href="http://webmoney.ru" target="_blank">WebMoney</a>:<ul><li>Z040641351490<li>R994895673790<li>E352541387643</ul>
+</p>
+</td></tr>
+
+
+<tr><td class="title" valign="top" align="center" colspan="4">
+<p align="left">&nbsp;<b>Установка CuteNews.RU</b></font></td></tr>
+
+<tr><td bgcolor="#ffffff" width="14" valign="top" height="7">&nbsp;</td>
+<td class="info" valign="top" height="7" colspan="3"><p align="left">Установка CuteNews.RU несложная, следует лишь соблюдать следующие инструкции:</p>
+<ol>
+<li>Скачайте <a href="http://cutenews.ru" target="_blank">последнюю версию скрипта</a>
+<li>Создайте директорию на вашем сервере (к примеру: cutenews).
+<li>Загрузите содержимое скаченного архива в директорию, созданную в первом шаге.
+<li>При помощи FTP-клиента выставьте необходимые права на чтение файлов
+<ul><li>CHMOD 777 для папки data/ и всех файлов
+<li>CHMOD 644 для файла index.php</ul>
+<li>Откройте http://yoursite.com/cutenews/index.php в любом браузере и следуйте инструкциям
+<li>После завершения установки скрипта не забудьте удалить файл inc/install.mdu</ol>
+</p>
+</td></tr>
+
+<tr><td class="title" valign="top" align="center" colspan="4">
+<p align="left">&nbsp;<b>Обновление скрипта</b></font></td></tr>
+
+<tr><td bgcolor="#ffffff" width="14" valign="top" height="7">&nbsp;</td>
+<td class="info" valign="top" height="7" colspan="3">
+<p align="left">
+<b>Внимание!</b> Если у Вас уже установлена более ранняя версия скрипта, и Вы хотите установить новую, сохранив при этом все новости, шаблоны и настройки, следуйте данной инструкции:</p>
+<ol>
+<li>Создайте резервную копию всех файлов папки data/
+<li>Распакуйте архив с последней версией скрипта во временный каталог
+<li>Загрузите все файлы из временного каталога на сервер (кроме файлов папки data/), заменив старые
+<li>Откройте Ваш сайт и зайдите в модуль администрирования скрипта
+<li>Измените настройка системы (Настройки &gt; Настройка системы)</ol>
+<p>Таким образом, можно полностью обновить работу скрипта, сохранив все необходимые данные!<br /><br /></p>
+</td></tr>
+
+<tr><td class="title" valign="top" align="center" colspan="4">
+<p align="left">&nbsp;<b>Отображение новостей</b></font></td></tr>
+
+<tr><td bgcolor="#ffffff" width="14" valign="top" align="center">&nbsp;</td>
+<td class="info" valign="top" align="center" height="7" colspan="3">
+<p align="left">
+Главной особенностью скрипта является легкость включения и изменения отображения новостей на страницах сайта. Для включения новостей на страницы вашего сайта необходимо использовать php-функцию <font color=#993300>include();</font> и специальные переменные:
+<ul class="list">
+<li>для отображения определенного количества новостей на странице используйте <font color=#993300>$number = "x";</font>
+<li>для отображения новостей из определенной категории используйте <font color=#993300>$category = "ID,ID,ID";</font> (ID - номер категории)
+<li>для отображения новости вместе с заголовками других новостей необходимо использовать <font color=#993300>$static = TRUE;</font>
+</ul>
+<b><a href="javascript:ShowHide('form_open','form_closed')" title="Нажмите, чтобы посмотреть/скрыть примеры кодов">Примеры кодов</a></b></font>
+</p></td></tr>
+
+<tr id="form_closed" style="display: none; padding: 0px; margin: 0px"><td bgcolor="#ffffff" width="14" valign="top" align="center">&nbsp;</td>
+<td class="info" valign="top" align="center" height="7" colspan="3">
+<p align="left">
+
+<p align="center"><b>Новости:</b></p>
+<p class="php">&lt;?PHP<br />&nbsp;include(&quot;path/to/show_news.php&quot;);<br /> ?&gt;</p>
+
+<p align="center"><b>Новости с другим шаблоном:</b></p>
+<p class="php">&lt;?PHP<br /> &nbsp;$template = &quot;YOUR_TEMPLATE_NAME&quot;;<br /> &nbsp;include(&quot;path/to/show_news.php&quot;);<br /> ?&gt;</p>
+
+<p align="center"><b>Архивы:</b></p>
+<p class="php">&lt;?PHP<br /> &nbsp;include(&quot;path/to/show_archives.php&quot;);<br /> ?&gt;</p>
+
+<p align="center"><b>5 последних новостей:</b></p>
+<p class="php">&lt;?PHP<br /> &nbsp;$number = &quot;5&quot;;<br /> &nbsp;include(&quot;path/to/show_news.php&quot;);<br /> ?&gt;</p>
+
+<p align="center"><b>5 новостей из категории 2:</b></p>
+<p class="php">&lt;?PHP<br /> &nbsp;$number = &quot;5&quot;;<br /> &nbsp;$category = &quot;2&quot;;<br /> &nbsp;include(&quot;path/to/show_news.php&quot;);<br /> ?&gt;</p>
+
+<p align="center"><b>Все заголовки и последние новости на одной странице:</b></p>
+<p class="php">&lt;?PHP<br /> &nbsp;$static = TRUE;<br /> &nbsp;$template = &quot;Headlines&quot;;<br /> &nbsp;include(&quot;path/to/show_news.php&quot;);<br /><br /> &nbsp;$number = &quot;1&quot;;<br /> &nbsp;include(&quot;path/to/show_news.php&quot;);<br /> ?&gt;</p>
+</p>
+
+<hr width=70%>
+<p align="left">
+
+<b>Помните:</b>
+<ul class="list">
+<li>Во всех вышеупомянутых примерах, вы должны заменить path/to/... путем к директории, в которую<br />вы установили CuteNews и не использовать URL в качестве пути.<br /><font color=#FF0000>НЕПРАВИЛЬНО</font>: include(&quot;http://site.com/cutenews/show_news.php);<br /><font color=#008000>ПРАВИЛЬНО</font>: include(&quot;cutenews/show_news.php);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li><li>В большинстве случаев, когда вы хотите включить (include) новости<br />и заголовки в одну страницу, используйте <font color=#993300>$static = TRUE;</font>.</li>
+<li>Если Вы используете $number, $category, $template или любую другую переменную,<br />она должна быть ДО include(&quot;show_news.php&quot;);</li>
+<li>Если у вас возникнут какие-либо проблемы, вы всегда можете зайти на наш форум,<br />и мы будем рады помочь вам!</li>
+</ul>
+</p>
+
+</td></tr>
+
+<tr><td class="title" valign="top" align="center" colspan="4">
+<p align="left"><b>&nbsp;Помощь и поддержка</font></b></td></tr>
+
+<tr><td bgcolor="#ffffff" width="16" valign="top" align="center">&nbsp;</td>
+<td class="info" valign="top" align="center" colspan="3">
+<p align="left">Если у вас возникнут какие-либо вопросы по CuteNews, заходите на <a href="http://ultra-music.com/forum/topic.php?forum=6" target="_blank">форум</a> русскоязычных пользователей CuteNews.<br />Но перед тем как публиковать свой вопрос на форуме, ознакомьтесь со справкой, входящей в CuteNews. Вы можете получить к ней доступ через систему: Помощь &gt; Документация по CuteNews</td></tr>
+
+<tr><td class="info" valign="top" align="center" colspan="4">&nbsp;</td></tr>
+
+<tr id="copyright"><td class="title" valign="top" align="center" colspan="4">
+<p align="left"><b>&nbsp;Копирайты</font></b></td></tr>
+
+<tr><td bgcolor="#ffffff" width="16" valign="top" align="center">&nbsp;</td>
+<td class="info" valign="top" align="center" colspan="3">
+<p align="left">
+Скрипт является модернизированной и усовершенствованной версией скрипта CuteNews от группы разработчиков <a href="http://cutephp.com" target="_blank">CutePHP Team</a>. Для создания CuteNews.RU использовались также оригинальные разработки пакета <a href="http://appelsinjuice.org/?vis=cutenews-aj" target="_blank">AJ-Fork</a>, разработанного на основе CuteNews. В работе над созданием русской версии принимали участие:<br />
+<ul class="list">
+<li>Slaver (<a href="http://ultra-music.com/" target="_blank">http://ultra-music.com</a>) - перевод, обновления и добавления, сайт;
+<li>Лёха zloy и красивый (<a href="http://lexa.ekolobok.ru/" target="_blank">http://lexa.ekolobok.ru</a>) - плагины, багфиксы, тестирование;
+<li>SwiZZeR (<a href="http://www.milecore.net/" target="_blank">http://www.milecore.net</a>) - помощь в создании сайта, багфиксы, тестирование;
+<li>Dozent (<a href="http://plotnikova.com/" target="_blank">http://plotnikova.com</a>) - предложения, багфиксы, тестирование;
+<li><a href="mailto:rmcippo [at] starnet.ru">Cippolino</a> - багфиксы, тестирование
+<li>и все <a href="http://ultra-music.com/forum/topic.php?forum=6" target="_blank">форумчане</a>, которым небезразлично будущее скрипта...
+</ul></p>
+<p align="left">
+Если Вы используете на своем сайте скрипт CuteNews.RU, то Вы <u>ДОЛЖНЫ</u> разместить на всех страницах своего сайт ссылку такого содержания:<br /><br />Powered by <a href="http://cutenews.ru/" target=_blank>CuteNews.RU</a> &copy; 2004 (Original by <a href="http://cutephp.com/" target=_blank>CutePHP</a>)<br /><br />Можете использовать следующий php-код:
+<p class="php">&lt;?PHP<br />echo'Powered by &lt;a href="http://cutenews.ru/" target="_blank"&gt;<br />$config_version_name $config_version_id&lt;/a&gt; &amp;copy; 2004<br />(Original by &lt;a href="http://cutephp.com/" target="_blank">CutePHP&lt;/a&gt;)';<br />?&gt;</p>
+</td></tr>
+
+<tr><td bgcolor="#ffffff" width="16" valign="top" align="center">&nbsp;</td>
+<td class="info" valign="top" align="center" colspan="3">
+
+<tr><td class="title" valign="top" align="center" colspan="4">
+<p align="left"><b>&nbsp;Что нового?</font></b></td></tr>
+
+<tr><td bgcolor="#ffffff" width="16" valign="top" align="center">&nbsp;</td>
+<td class="info" valign="top" colspan="3">
+<p align="left">
+<b>Сборка - 026</b>
+<ol>
+<li>Добавлен менеджер плагинов и набор включенных плагинов, о каждом из которых можно почитать <a href="http://cutenews.ru/category/4/" target="_blank">здесь</a>
+<li>Вывод ссылок на страницах новостей стал сокращенным, если страниц больше 10-ти
+<li>Включена проверка на наличие установочного файла, проверка версии php-интерпретатора и свободного места на сервере
+<li>Теперь русифицированы все даты во всех модулях скрипта. Кроме поля для изменения даты новости (там нужно вводить дату на английском!)
+<li>Изменена страница для печати. Теперь она использует шаблоны
+<li>Изменена RSS-лента. Теперь она также использует шаблоны
+<li>Обновлен модуль "Дополнительные поля", который стал еще более функциональным
+<ul>
+<li>использование кириллических символов в полях
+<li>изменение очередности полей
+<li>три вида типа поля
+<li>выбор категории для каждого поля
+<ul><li>одна строка<li>несколько строк<li>выпадающее меню</ul></ul>
+<li>Включена корректная обработка сохраненных данных для комментариев в Cookie
+<li>Добавлена функция группового вывода даты на несколько новостей за один день
+</ol>
+</td></tr>
+
+<tr><td bgcolor="#ffffff" width="16" valign="top" align="center">&nbsp;</td>
+<td class="info" valign="top" align="center" colspan="3">
+</table>
+</td></tr>
+</table>
+</body>
+</html>

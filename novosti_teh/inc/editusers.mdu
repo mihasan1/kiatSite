@@ -1,0 +1,367 @@
+<?PHP
+include_once("{$cutepath}/inc/langdate.php");
+
+if($member_db[1] != 1){ msg("error", "Доступ запрещен", "Вы не можете редактировать пользователей"); }
+// ********************************************************************************
+// List All Available Users + Show Add User Form
+// ********************************************************************************
+if($action == "list")
+{
+    echoheader("users","Пользователи");
+
+    echo'<script language="javascript">
+    <!-- begin
+    function popupedit(id){
+    window.open(\''.$PHP_SELF.'?mod=editusers&action=edituser&id=\'+id,\'User\',\'toolbar=0,location=0,status=0,menubar=0,scrollbars=0,resizable=0,width=360,height=210\');
+    }
+    function confirmdelete(id){
+    var agree=confirm("Вы уверены, что хотите удалить этого пользователя?");
+    if (agree)
+    document.location="'.$PHP_SELF.'?mod=editusers&action=dodeleteuser&id="+id;
+    }
+    // end -->
+    </script>
+    <table border=0 cellpading=0 cellspacing=0 width=654>
+    <tr>
+    <td width=654 colspan="6">
+<!-- Start add edit users table + info + help -->
+  <table border="0" width="657"  cellspacing="0" cellpadding="0" height="81" >
+    <tr>
+      <td valign="bottom" width="311" valign="top" height="1">
+
+      <b>Добавить пользователя</b>
+
+      </td>
+      <td width="5" valign="top"  rowspan="3" height="81">
+
+      </td>
+      <td valign="bottom" width="330" height="1"><b>Уровень доступа пользователя</b></td>
+    </tr>
+
+    <tr>
+      <td width="311" rowspan="2" valign="top" height="60" >
+
+<!-- Add User Table -->
+  <table class="panel" cellspacing="0" cellpadding="0" width="100%">
+  <form method=post action="'.$PHP_SELF.'">
+    <tr>
+      <td>&nbsp;Имя:</td>
+      <td><input size=21 type=text name=regusername></td>
+    </tr>
+    <tr>
+      <td>&nbsp;Пароль:</td>
+      <td><input size=21 type=text name=regpassword></td>
+    </tr>
+    <tr>
+      <td>&nbsp;Ник:</td>
+      <td><input size=21 type=text name=regnickname></td>
+    </tr>
+    <tr>
+      <td>&nbsp;E-mail:</td>
+      <td><input size=21 type=text name=regemail></td>
+    </tr>
+    <tr>
+      <td>&nbsp;Уровень доступа:</td>
+      <td><select name=reglevel>
+           <option value=4>4 (комментатор)</option>
+           <option selected value=3>3 (журналист)</option>
+           <option value=2>2 (редактор)</option>
+           <option value=1>1 (администратор)</option>
+             </select>
+        </td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td height="35"><input type=submit value="     Добавить     ">
+          <input type=hidden name=action value=adduser>
+            <input type=hidden name=mod value=editusers>
+      </td>
+    </tr>
+    </form>
+  </table>
+<!-- End Add User Table -->
+
+      </td>
+      <td width="330" height="1" valign="top" >
+
+<!-- User Levels Table -->
+  <table class="panel" cellspacing="3" cellpadding="0" width="100%">
+    <tr>
+      <td valign="top">&nbsp;Администратор: имеет все права и полный доступ<br>
+        &nbsp;Редактор: может добавлять и редактировать новости<br>
+        &nbsp;Журналист: может добавлять, и редактировать собственные новости<br>
+        &nbsp;Комментатор: только комментарии</td>
+    </tr>
+  </table>
+<!-- End User Levels Table -->
+
+      </td>
+    </tr>
+    <tr>
+      <td width="330" valign="top" align=center height="70"><br>
+
+      <!-- HELP -->
+   <table height="25" cellspacing="0" cellpadding="0">
+    <tr>
+      <td width="25" align=middle><img border="0" src="skins/images/help_small.gif" width="25" height="25"></td>
+      <td>&nbsp;<a onClick="javascript:Help(\'users\')" href="#">Что такое уровни доступа?</a>&nbsp;</td>
+    </tr>
+  </table>
+     <!-- END HELP -->
+      </td>
+    </tr>
+  </table>
+<!-- END add edit users table + info + help -->
+
+    </tr>
+    <tr>
+    <td width=654 colspan="6">
+    </tr>
+    <tr>
+    <td width=650 colspan="6">
+    <img height=20 border=0 src="skins/images/blank.gif" width=1><br>
+    <b>Пользователи</b>
+    </tr>
+
+    <tr>
+    <td width=130 bgcolor="#F7F6F4">
+    &nbsp;<u>Имя:</u>
+    <td width=197 bgcolor="#F7F6F4">
+    <u>Дата регистрации:</u>
+    <td width=2 bgcolor="#F7F6F4">
+    &nbsp;
+    <td width=83 bgcolor="#F7F6F4">
+    <u>Публикаций:</u>
+    <td width=132 bgcolor="#F7F6F4">
+    <u>Уровень доступа:</u>
+    <td width=93 bgcolor="#F7F6F4">
+    <u>Действие:</u>
+    </tr>';
+
+    $all_users = file("./data/users.db.php");
+    $i = 1;
+    foreach($all_users as $user_line)
+    {
+        $i++; $bg = "";
+        if($i%2 == 0){ $bg = "bgcolor=\"#f7f6f4\""; }
+        if(!eregi("<\?",$user_line)){
+        $user_arr = explode("|", $user_line);
+
+        if(isset($user_arr[9]) and $user_arr[9] != ''){ $last_login = langdate('j M Y - h:m',$user_arr[9]); }
+        else{ $last_login = 'не был ни разу'; }
+
+        switch($user_arr[1]){
+        case 1: $user_level = "администратор"; break;
+        case 2: $user_level = "редактор"; break;
+        case 3: $user_level = "журналист"; break;
+        case 4: $user_level = "комментатор"; break;
+        }
+        echo"<tr $bg title='$user_arr[2] последний раз был в системе:\n$last_login'>
+        <td width=143>
+        &nbsp;$user_arr[2]
+        <td width=197>";
+        echo( langdate("j M Y - H:i",$user_arr[0]) );
+        echo"<td width=2>
+        <td width=83 >
+        &nbsp;&nbsp;$user_arr[6]
+        <td width=122>
+        &nbsp;$user_level
+        <td width=80 title=''>
+        <a  onClick=\"javascript:popupedit('$user_arr[0]'); return(false)\" href=#>[изменить]</a>&nbsp;<a onClick=\"javascript:confirmdelete('$user_arr[0]'); return(false)\"  href=\"$PHP_SELF?mod=editusers&action=dodeleteuser&id=$user_arr[0]\">[удалить]</a>
+        </tr>";
+        }
+    }
+
+    echo"</table>";
+
+    echofooter();
+}
+// ********************************************************************************
+// Add User
+// ********************************************************************************
+elseif($action == "adduser")
+{
+    if(!$regusername){ msg("error","Error !!!", "Заполните поле 'Имя'!", "javascript:history.go(-1)"); }
+    if(!$regpassword){ msg("error","Error !!!", "Заполните поле 'Пароль'!", "javascript:history.go(-1)"); }
+
+    $all_users = file("./data/users.db.php");
+    foreach($all_users as $user_line)
+    {
+        $user_arr = explode("|", $user_line);
+        if($user_arr[2] == $regusername){ msg("error", "Ошибка !!!", "Пользователь с таким именем уже есть !", "javascript:history.go(-1)"); }
+    }
+
+    $add_time = time()+($config_date_adjust*60);
+    $regpassword = md5($regpassword);
+
+    $old_users_file = file("./data/users.db.php");
+    $new_users_file = fopen("./data/users.db.php", "a");
+
+    fwrite($new_users_file, "$add_time|$reglevel|$regusername|$regpassword|$regnickname|$regemail|0|0||||\n");
+
+    fclose($new_users_file);
+
+    switch($reglevel){
+    case "1": $level = "администратор"; break;
+    case "2": $level = "редактор"; break;
+    case "3": $level = "журналист"; break;
+    case "4": $level = "комментатор"; break;
+    }
+    msg("info","Пользователь добавлен","Пользователь <b>$regusername</b> был успешно зарегистрирован как <b>$level</b>", "$PHP_SELF?mod=editusers&action=list");
+}
+// ********************************************************************************
+// Edit User Details
+// ********************************************************************************
+elseif($action == "edituser")
+{
+
+    $users_file = file("./data/users.db.php");
+    foreach($users_file as $user_line){
+        $user_arr = explode("|", $user_line);
+        if($id == $user_arr[0]){
+            break;
+        }
+    }
+
+    if(isset($user_arr[9]) and $user_arr[9] != ''){ $last_login = langdate('j M Y - h:m',$user_arr[9]); }
+    else{ $last_login = 'не был ни разу'; }
+
+    echo"<html><head>
+    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=windows-1251\">
+    <title>Редактирование пользователя</title>
+    <style type=\"text/css\">
+    <!--
+        select, option, textarea, input {
+        BORDER-RIGHT: #808080 1px solid;
+        BORDER-TOP: #808080 1px solid;
+        BORDER-BOTTOM: #808080 1px solid;
+        BORDER-LEFT: #808080 1px solid;
+        COLOR: #000000;
+        FONT-SIZE: 11px;
+        FONT-FAMILY: Verdana; BACKGROUND-COLOR: #ffffff }
+            TD {text-decoration: none; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt;}
+            BODY {text-decoration: none; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 3pt;}
+            .header { font-size : 16px; font-weight: bold; color: #808080; font-family: verdana; text-decoration: none; }
+    -->
+    </style>
+    </head>
+    <body>
+    <form action=\"$PHP_SELF\" method=post><table width=\"828\" cellspacing=\"0\" cellpadding=\"0\" height=\"13\">
+    <td width=\"826\" height=\"21\" colspan=\"2\"><div class=header>$user_arr[2] <font size=\"2\">($user_arr[4])</font></div>
+
+    <tr>
+    <td width=\"126\" height=\"20\" bgcolor=\"#f7f6f4\">Публикаций:
+    <td  height=\"20\" bgcolor=\"#f7f6f4\" width=\"698\">
+    $user_arr[6]
+    </tr>
+
+    <tr>
+    <td width=\"126\" height=\"20\">Последний раз в системе:<td  height=\"20\" width=\"698\">$last_login
+    </tr>
+
+    <tr>
+    <td width=\"126\" height=\"20\" bgcolor=\"#f7f6f4\">Дата регистрации:
+    <td  height=\"20\" width=\"698\" bgcolor=\"#f7f6f4\">";
+    echo langdate("j M Y - h:m", $user_arr[0]);
+    echo"
+    </tr>
+
+    <tr>
+    <td width=\"126\" height=\"20\">E-mail:
+    <td  height=\"20\" width=\"698\">
+    $user_arr[5]
+    </tr>
+
+    <tr><td width=\"126\" height=\"20\" bgcolor=\"#f7f6f4\">Новый пароль:
+    <td  height=\"20\" width=\"698\" bgcolor=\"#f7f6f4\">
+    <input size=\"20\" name=\"editpassword\" >
+    </tr>
+
+    <tr>
+    <td width=\"126\" height=\"20\">Уровень доступа:
+    <td  height=\"20\" width=\"698\">
+    <select name=editlevel>";
+
+    if($user_arr[1] == 4){echo" <option value=4 selected>4 (комментатор)</option>";} else {echo" <option value=4>4 (комментатор)</option>";}
+    if($user_arr[1] == 3){echo" <option value=3 selected>3 (журналист)</option>";}   else {echo" <option value=3>3 (журналист)</option>";}
+    if($user_arr[1] == 2){echo" <option value=2 selected>2 (редактор)</option>";}    else {echo" <option value=2>2 (редактор)</option>";}
+    if($user_arr[1] == 1){echo" <option value=1 selected>1 (администратор)</option>";}else {echo" <option value=1>1 (администратор)</option>";}
+
+    echo"</select>
+    </tr>
+    <tr>
+    <td width=\"826\" height=\"7\" colspan=\"2\">
+    <br />
+    <input type=submit value=\"Сохранить\">   <input type=button value=\"Отмена\" onClick=\"window.close();\">
+    <input type=hidden name=id value=$id>
+    <input type=hidden name=mod value=editusers>
+    <input type=hidden name=action value=doedituser>
+    </tr>
+    </table></form>
+    </body>
+    </html>";
+
+
+}
+// ********************************************************************************
+// Do Edit User
+// ********************************************************************************
+elseif($action == "doedituser")
+{
+    if(!$id){ die("Пользователь недействителен"); }
+
+    $old_db = file("./data/users.db.php");
+    $new_db = fopen("./data/users.db.php", "w");
+    foreach($old_db as $old_db_line){
+       $old_db_arr = explode("|", $old_db_line);
+        if($id != $old_db_arr[0]){
+            fwrite($new_db,"$old_db_line");
+        }else{
+            if($editpassword != ""){
+                $old_db_arr[3] = md5($editpassword);
+                if($old_db_arr[2] == $username){setcookie("md5_password", $old_db_arr[3]); }
+            }
+            fwrite($new_db,"$old_db_arr[0]|$editlevel|$old_db_arr[2]|$old_db_arr[3]|$old_db_arr[4]|$old_db_arr[5]|$old_db_arr[6]|$old_db_arr[7]|$old_db_arr[8]|$old_db_arr[9]||\n");
+        }
+    }
+    fclose($new_db);
+    $result = "Изменения сохранены";
+
+    echo"<html>
+    <head>
+    <title>Редактировние пользователя</title>
+    </head>
+    <body bgcolor=#FFFFFF>
+    <table border=0 cellpading=0 cellspacing=0 width=100% height=100% >
+    <tr><td align=middle width=154>
+    <p align=right><img border=0 src=\"skins/images/info.gif\" width=60 height=57>
+    </td><td align=middle width=558>
+    <p align=left>$result
+    </td></tr>
+    </table>
+    </body>
+    </html>";
+
+}
+// ********************************************************************************
+// Delete User
+// ********************************************************************************
+elseif($action == "dodeleteuser")
+{
+    if(!$id){ die("Такого пользователя нет!"); }
+
+    $old_users_file = file("./data/users.db.php");
+    $new_users_file = fopen("./data/users.db.php", "w");
+    foreach($old_users_file as $old_user_line){
+        $old_user_line_arr = explode("|", $old_user_line);
+        if($id != $old_user_line_arr[0]){
+            fwrite($new_users_file, $old_user_line);
+        }else{
+            $deleted = TRUE; $user = $old_user_line_arr[2];
+        }
+    }
+    fclose($new_users_file);
+
+    msg("info","Пользователь удален","Пользователь $user был успешно удален.", "$PHP_SELF?mod=editusers&action=list");
+}
+?>

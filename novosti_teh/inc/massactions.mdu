@@ -1,0 +1,250 @@
+<?PHP
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Mass Delete
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+if($action == "mass_delete"){
+
+if(!$selected_news){ msg("error", "Ошибка!!!", "Выберите статьи", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+
+echoheader("options", "Удаление новостей");
+echo "<form method=post action=\"$PHP_SELF\"><table border=0 cellpading=0 cellspacing=0 width=100% height=100%><tr><td >Вы уверены, что хотите удалить выбранные (<b>".count($selected_news)."</b>) новости?<br><br>
+<input type=button value=\"  Нет  \" onclick=\"javascript:document.location='$PHP_SELF?mod=editnews&action=list&source=$source'\"> &nbsp; <input type=submit value=\"   Да   \">
+<input type=hidden name=action value=\"do_mass_delete\">
+<input type=hidden name=mod value=\"massactions\">
+<input type=hidden name=source value=\"$source\">";
+foreach($selected_news as $newsid){
+echo "<input type=hidden name=selected_news[] value=\"$newsid\">\n";
+}
+echo "</td></tr></table></form>";
+
+echofooter();
+exit;
+
+}
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Do Mass Delete
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+elseif($action == "do_mass_delete"){
+if(!$selected_news){ msg("error", "Ошибка!!!", "Выберите статьи", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+if($source == ""){ $news_file = "data/news.txt"; $comm_file = "data/comments.txt";}
+else{ $news_file = "./data/archives/$source.news.arch"; $comm_file = "./data/archives/$source.comments.arch"; }
+
+$deleted_articles = 0;
+
+// Delete News
+    $old_db = file("$news_file");
+    $new_db = fopen("$news_file", w);
+    foreach($old_db as $old_db_line){
+        $old_db_arr = explode("|", $old_db_line);
+        if(@!in_array($old_db_arr[0], $selected_news)){
+            fwrite($new_db,"$old_db_line");
+            }
+            else
+            {
+                $have_perm = 0;
+                   if(($member_db[1] == 1) or ($member_db[1] == 2)){$have_perm = 1;}
+                   elseif($member_db[1] == 3 and $old_db_arr[1] == $member_db[2]) {$have_perm = 1;}
+                if(!$have_perm){ fwrite($new_db,"$old_db_line"); }
+                else{$deleted_articles ++;
+                run_actions('mass-deleted');
+  // XFields Call
+  $xfieldsaction = "delete";
+  $xfieldsid = $old_db_arr[0];
+  include("xfields.mdu");
+  // End XFields Call
+    }
+    }
+    }
+    fclose($new_db);
+
+// Delete Comments
+    $old_db = file("$comm_file");
+    $new_db = fopen("$comm_file", w);
+    foreach($old_db as $old_db_line){
+        $old_db_arr = explode("|", $old_db_line);
+        if(@!in_array($old_db_arr[0], $selected_news)){
+            fwrite($new_db,"$old_db_line");
+            }
+            else
+            {
+                $have_perm = 0;
+                   if(($member_db[1] == 1) or ($member_db[1] == 2)){$have_perm = 1;}
+                   elseif($member_db[1] == 3 and $old_db_arr[1] == $member_db[2]) {$have_perm = 1;}
+                if(!$have_perm){ fwrite($new_db,"$old_db_line"); }
+                else{ /* Do Nothing => Delete :) */ }
+            }
+    }
+    fclose($new_db);
+run_actions('deleted-multiple-entries');
+
+if(count($selected_news) == $deleted_articles){ msg("info", "Удаление новостей", "Все выбранные Вами статьи (<b>$deleted_articles</b>) удалены!", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+else{ msg("error", "Удаление новостей (найдены ошибки!!!)", "$deleted_articles из ".count($selected_news)." новостей удалены", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+}
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Mass Move to Cat
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+elseif($action == "mass_move_to_cat"){
+
+if(!$selected_news){ msg("error", "Ошибка!!!", "Выберите статьи", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+$cat_lines = file("./data/category.db.php");
+
+echoheader("options", "Изменений категорий статей");
+
+echo "<form action=\"$PHP_SELF\" method=post><table border=0 cellpading=0 cellspacing=0 width=100% height=100%><tr><td>Изменить категорию для выбранных статей (<b>".count($selected_news)."</b>) на:
+<select name=move_to_category><option value=\"\"> </option>";
+    foreach($cat_lines as $single_line){
+        $cat_arr = explode("|", $single_line);
+        $if_is_selected = "";
+        echo "<option value=\"$cat_arr[0]\">$cat_arr[1]</option>";
+    }
+echo "</select>";
+
+foreach($selected_news as $newsid){
+    echo "<input type=hidden name=selected_news[] value=\"$newsid\">";
+}
+
+echo "&nbsp;<input type=hidden name=action value=\"do_mass_move_to_cat\"><input type=hidden name=source value=\"$source\"><input type=hidden name=mod value=\"massactions\">&nbsp;<input type=submit value=\"OK\"></td></tr></table></form>";
+
+echofooter();
+exit;
+}
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  DO Mass Move to One Category
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+elseif($action == "do_mass_move_to_cat"){
+if(!$selected_news){ msg("error", "Ошибка!!!", "Выберите статьи", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+if($source == ""){ $news_file = "./data/news.txt";}
+else{ $news_file = "./data/archives/$source.news.arch"; }
+    $moved_articles = 0;
+    $old_db = file("$news_file");
+    $new_db = fopen("$news_file", w);
+    foreach($old_db as $old_db_line){
+        $old_db_arr = explode("|", $old_db_line);
+        if(@!in_array($old_db_arr[0], $selected_news)){
+            fwrite($new_db,"$old_db_line");
+            }
+            else
+            {
+                $have_perm = 0;
+                   if(($member_db[1] == 1) or ($member_db[1] == 2)){$have_perm = 1;}
+                   elseif($member_db[1] == 3 and $old_db_arr[1] == $member_db[2]) {$have_perm = 1;}
+                if(!$have_perm){ fwrite($new_db,"$old_db_line"); }
+                else{
+                    fwrite($new_db,"$old_db_arr[0]|$old_db_arr[1]|$old_db_arr[2]|$old_db_arr[3]|$old_db_arr[4]|$old_db_arr[5]|$move_to_category|||\n");
+                    $moved_articles ++;
+                }
+            }
+    }
+    fclose($new_db);
+if(count($selected_news) == $moved_articles){ msg("info", "Категория изменена", "Категория для выбранных Вами статей ($moved_articles) изменена", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+else{ msg("error", "Категория изменена (с ошибками)", "Для $moved_articles из ".count($selected_news)." выбранных Вами статей категория изменена", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+}
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Mass Archive
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+elseif($action == "mass_archive"){
+if(!$selected_news){ msg("error", "Ошибка!!!", "Выберите статьи", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+if($source != ""){ msg("error", "Ошибка!!!", "Статьи уже заархивированы", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+
+echoheader("options", "Отправка статей в архив");
+
+echo "<form method=post action=\"$PHP_SELF\"><table border=0 cellpading=0 cellspacing=0 width=100% height=100%><tr><td >Вы уверены, что хотите отправить статьи (<b>".count($selected_news)."</b>) в архив?<br><br>
+<input type=button value=\"  Нет  \" onclick=\"javascript:document.location='$PHP_SELF?mod=editnews&action=list&source=$source'\"> &nbsp; <input type=submit value=\"   Да   \">
+<input type=hidden name=action value=\"do_mass_archive\">
+<input type=hidden name=mod value=\"massactions\">";
+foreach($selected_news as $newsid){
+echo"<input type=hidden name=selected_news[] value=\"$newsid\">\n";
+}
+echo"</td></tr></table></form>";
+
+echofooter();
+exit;
+}
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  DO Mass Send To Archive
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+elseif($action == "do_mass_archive"){
+if($member_db[1] != 1){ msg("error", "Доступ отклонен", "Вы не можете использовать эту функцию, если Вы не администратор!"); }
+if(!$selected_news){ msg("error", "Ошибка!!!", "Выберите статьи", "$PHP_SELF?mod=editnews&action=list&source=$source"); }
+if(!is_writable("./data/archives/")){ msg("error", "Ошибка!!!", "Невозможна запись в папку ./data/archives/. Изменить CHMOD на 777"); }
+$news_file = "./data/news.txt";
+$comm_file = "./data/comments.txt";
+
+    $prepeared_for_archive = array();
+    $prepeared_comments_for_archive = array();
+    $archived_news = 0;
+
+// Prepear the news for Archiving
+
+    $old_db = file("$news_file");
+    $new_db = fopen("$news_file", w);
+    foreach($old_db as $old_db_line){
+        $old_db_arr = explode("|", $old_db_line);
+        if(@!in_array($old_db_arr[0], $selected_news)){
+            fwrite($new_db,"$old_db_line");
+            }
+            else
+            {
+                $have_perm = 0;
+                   if(($member_db[1] == 1) or ($member_db[1] == 2)){$have_perm = 1;}
+                   elseif($member_db[1] == 3 and $old_db_arr[1] == $member_db[2]) {$have_perm = 1;}
+                if(!$have_perm){ fwrite($new_db,"$old_db_line"); }
+                else{
+                    $prepeared_news_for_archive[] = $old_db_line;
+                    $archived_news++;
+                }
+            }
+    }
+    fclose($new_db);
+
+    if($archived_news == 0){ msg("error", "Ошибка!!!", "Не найдено новостей для архивирования"); }
+
+// Prepear the comments for Archiving
+
+    $old_db = file("$comm_file");
+    $new_db = fopen("$comm_file", w);
+    foreach($old_db as $old_db_line){
+        $old_db_arr = explode("|", $old_db_line);
+        if(@!in_array($old_db_arr[0], $selected_news)){
+            fwrite($new_db,"$old_db_line");
+            }
+            else
+            {
+                $have_perm = 0;
+                   if(($member_db[1] == 1) or ($member_db[1] == 2)){$have_perm = 1;}
+                   elseif($member_db[1] == 3 and $old_db_arr[1] == $member_db[2]) {$have_perm = 1;}
+                if(!$have_perm){ fwrite($new_db,"$old_db_line"); }
+                else{
+                    $prepeared_comments_for_archive[] = $old_db_line;
+                }
+            }
+    }
+    fclose($new_db);
+
+// Start Archiving
+
+$arch_name = time()+($config_date_adjust*60);
+
+    $arch_news = fopen("./data/archives/$arch_name.news.arch", w);
+    foreach($prepeared_news_for_archive as $item){
+        fwrite($arch_news, "$item");
+    }
+    fclose($arch_news);
+
+    $arch_comm = fopen("./data/archives/$arch_name.comments.arch", w);
+    foreach($prepeared_comments_for_archive as $item){
+        fwrite($arch_comm, "$item");
+    }
+    fclose($arch_comm);
+
+msg("info", "Новости заархивированы", "Все выбранные Вами новости ($archived_news) заархивированы в файл  ./data/archives/<b>$arch_name</b>.news.arch", "$PHP_SELF?mod=editnews&action=list&source=$source");
+}
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  If No Action Is Choosed
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+else{
+
+msg("info", "Выберите действие", "Выберите действие из выпадающего меню", "$PHP_SELF?mod=editnews&action=list&source=$source");
+}
+?>

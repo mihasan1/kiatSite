@@ -1,0 +1,111 @@
+<?PHP
+if($member_db[1] != 1){ msg("error", "Доступ запрещен", "У вас нет доступа в этот раздел"); }
+// ********************************************************************************
+// Add IP
+// ********************************************************************************
+if($action == "add")
+{
+    if(!$add_ip){ msg("error","Ошибка !!!","Заполните поле IP", "$PHP_SELF?mod=ipban"); }
+
+    $all_ip = file("./data/ipban.db.php");
+    $exist = FALSE;
+    foreach($all_ip as $ip_line)
+    {
+        $ip_arr = explode("|", $ip_line);
+        if($ip_arr[0] == $add_ip){ $exist = TRUE; }
+    }
+    if(!$exist)
+    {
+	$add_ip = strip_tags($add_ip);
+        $new_ips = fopen("./data/ipban.db.php", "a");
+        $add_ip = stripslashes( preg_replace(array("'\|'",), array("I",), $add_ip) );
+        fwrite($new_ips, "$add_ip|0||\n");
+        fclose($new_ips);
+    }
+}
+// ********************************************************************************
+// Remove IP
+// ********************************************************************************
+elseif($action == "remove")
+{
+    if(!$remove_ip){ msg("error","Ошибка !!!","Заполните поле IP", "$PHP_SELF?mod=ipban"); }
+
+    $old_ips = file("./data/ipban.db.php");
+    $new_ips = fopen("./data/ipban.db.php", "w");
+
+    foreach($old_ips as $old_ip_line){
+        $ip_arr = explode("|", $old_ip_line);
+        if($ip_arr[0] != stripslashes($remove_ip)){
+            fwrite($new_ips, $old_ip_line);
+        }
+    }
+    fclose($new_ips);
+}
+// ********************************************************************************
+// List all IP
+// ********************************************************************************
+echoheader("options", "Блокировка IP");
+
+echo'<table border=0 cellpading=0 cellspacing=0 width="645" >
+    <form method=post action="'.$PHP_SELF.'">
+    <td width=321 height="33">
+    <b>Заблокировать IP</b>
+<table border=0 cellpading=0 cellspacing=0 width=379  class="panel" cellpadding="7" >
+    <tr>
+    <td width=79 height="25">
+    &nbsp;IP адрес:
+    <td width=300 height="25">
+    <input type=text name=add_ip>&nbsp;&nbsp; <input type=submit value="Заблокировать">
+    </tr>
+    <input type=hidden name=action value=add>
+    <input type=hidden name=mod value=ipban>
+    </form>
+    </table>
+    <tr>
+    <td width=654 height="11">
+        <img height=20 border=0 src="skins/images/blank.gif" width=1>
+    </tr><tr>
+    <td width=654 height=14>
+    <b>Заблокированные IP адреса</b>
+    </tr>
+    <tr>
+    <td width=654 height=1>
+  <table width=641 height=100% cellspacing=0 cellpadding=0>
+    <tr>
+      <td width=15 bgcolor=#F7F6F4></td>
+      <td width=260 bgcolor=#F7F6F4><u>IP:</u></td>
+      <td width=218 bgcolor=#F7F6F4><u>Сколько раз блокировался:</u></td>
+      <td width=140 bgcolor=#F7F6F4>&nbsp;<u>Разблокировать:</u></td>
+    </tr>';
+
+
+$all_ips = file("./data/ipban.db.php");
+$i = 0;
+foreach($all_ips as $ip_line)
+{
+    if(!eregi("<\?",$ip_line))
+    {
+        if($i%2 != 0){ $bg = "bgcolor=#F7F6F4"; }else{ $bg = ""; }
+        $i++;
+        $ip_arr = explode("|", $ip_line);
+        $ip_arr[0] = stripslashes( preg_replace(array("'\"'", "'\''"), array("&quot;", "&#039;"), $ip_arr[0]) );
+        echo"
+        <tr $bg height=18>
+        <td></td>
+        <td>
+        <a href=\"http://www.ripe.net/perl/whois?searchtext=$ip_arr[0]\" target=_blank title=\"Получить информацию об этом ip\">$ip_arr[0]</a>
+        </td>
+           <td>$ip_arr[1]</td>
+        <td>
+        <a href=\"$PHP_SELF?mod=ipban&action=remove&remove_ip=$ip_arr[0]\">[разблокировать]</a></td>
+        </tr>
+        ";
+    }
+}
+
+if($i == 0){ echo"<tr><td align=center colspan=5><br> &nbsp;Нет заблокированных IP адресов!</td></tr>"; }
+
+echo'</table></table>';
+
+echofooter();
+?>

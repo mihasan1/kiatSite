@@ -1,0 +1,837 @@
+<?PHP
+include_once("{$cutepath}/inc/langdate.php");
+
+// ********************************************************************************
+// Options Menu
+// ********************************************************************************
+if($action == "options" or $action == '')
+{
+    echoheader("options","Настройки");
+
+    //----------------------------------
+    // Predefine Options
+    //----------------------------------
+
+    // access means the lower level of user allowed; 1:admin, 2:editor+admin, 3:editor+admin+journalist, 4:all
+    $options = array(
+                    array(
+                    'name'        => "Личные настройки",
+                    'url'        => "$PHP_SELF?mod=options&action=personal",
+                    'access'    => "4",
+                    ),
+
+                    array(
+                    'name'        => "Блокировка IP",
+                    'url'        => "$PHP_SELF?mod=ipban",
+                    'access'    => "1",
+                    ),
+
+                    array(
+                    'name'        => "Настройка системы",
+                    'url'        => "$PHP_SELF?mod=options&action=syscon&rand=".time(),
+                    'access'    => "1",
+                    ),
+
+                    array(
+                       'name'        => "Шаблоны",
+                       'url'        => "$PHP_SELF?mod=options&action=templates",
+                       'access'    => "1",
+                    ),
+
+                    array(
+                       'name'        => "Пользователи",
+                       'url'        => "$PHP_SELF?mod=editusers&action=list",
+                       'access'    => "1",
+                    ),
+
+                    array(
+                       'name'        => "Управление архивами",
+                       'url'        => "$PHP_SELF?mod=tools&action=archive",
+                       'access'    => "1",
+                    ),
+
+                    array(
+                       'name'        => "Управление картинками",
+                       'url'        => "$PHP_SELF?mod=images",
+                       'access'    => "1",
+                    ),
+
+                    array(
+                       'name'        => "Резервные копии",
+                       'url'        => "$PHP_SELF?mod=tools&action=backup",
+                      'access'    => "1",
+                    ),
+
+                    array(
+                       'name'        => "Категории",
+                       'url'        => "$PHP_SELF?mod=categories",
+                       'access'    => "1",
+                    ),
+
+		    array(
+                    'name'        => "Поиск и замена",
+                    'url'        => "$PHP_SELF?mod=snr",
+                    'access'    => "1",
+                    ),
+                    
+                    array(
+                    'name'       => "Дополнительные поля",
+                    'url'    => "$PHP_SELF?mod=xfields&xfieldsaction=configure",
+                    'access'      => "1",
+                    ),
+
+		    // Start plugins hack
+		    array(
+	            'name'		=> "Плагины",
+     		    'url'		=> "$PHP_SELF?mod=options&action=plugins",
+		    'access'    	=> "1",
+                    ),
+                    // End plugins hack
+
+                    );
+
+$options = run_filters('cutenews-options',$options);
+
+//------------------------------------------------
+// Cut the options for wich we don't have access
+//------------------------------------------------
+    $count_options = count($options);
+    for($i=0; $i<$count_options; $i++){
+    	if($member_db[1] > $options[$i]['access']){
+			unset($options[$i]);
+        }
+    }
+    echo'<table border="0" width="100%"><tr>';
+    $i = 0;
+	foreach($options as $option){
+        if($i%2 == 0){ echo"</tr>\n<tr>\n<td width='47%'>&nbsp;&nbsp;&nbsp;<a href='".$option['url']."'><b>".$option['name']."</b></a></td>\n"; }
+        else{ echo"\n<td width='53%'><a href='".$option['url']."'><b>".$option['name']."</b></a></td>\n"; }
+    	$i++;
+    }
+
+    echo'</tr></table>';
+    echofooter();
+}
+// Start plugins hack
+elseif($action == 'plugins') {
+
+	$available_plugins = available_plugins();
+	
+	function SortByName($a, $b) {
+	return $a[name] > $b[name] ? 1 : -1;
+	}
+	uasort($available_plugins, 'SortByName');
+
+	if (isset($_GET[enable])) {
+	$id = stripslashes($_GET[enable]);
+	$filename = $available_plugins[$id][file];
+	enable_plugin($filename);
+	$buffer .= '<p>Включен плагин: <strong>'.$available_plugins[$id][name].'</strong></p>';
+	}
+
+	if (isset($_GET[disable])) {
+	$id = stripslashes($_GET[disable]);
+	$filename = $available_plugins[$id][file];
+	disable_plugin($filename);
+	$buffer .= '<p>Отключен плагин: <strong>'.$available_plugins[$id][name].'</strong></p>';
+	}
+	
+	echoheader("user","Плагины");
+		
+	$buffer .= '
+	<table class="grid" id="plugins">
+	<thead>
+	<tr>
+	<th>Название</th>
+	<th>Версия</th>
+	<th>Описание</th>
+	<th>Автор</th>
+	<th>Действие</th>
+	</tr>
+	</thead>
+	<tbody>';
+	
+	$querystring = '?mod=options&amp;action=plugins';
+	
+	foreach ($available_plugins as $id => $plugin) {
+	$enabled = plugin_enabled($plugin[file]);
+	$class = $enabled ? 'enabled' : 'disabled';
+	$class = $plugin[compatible] ? $class : 'incompatible';
+	$buffer .= '
+	<tr class="'.$class.'"'.($plugin[compatible] ? '' : ' title="Требуется версия  '.$plugin[framework].' менеджера"').'>
+	<td>'.($plugin[uri] ?  '<a href="'.$plugin[uri].'">'.$plugin[name].'</a>': $plugin[name]).'</td>
+	<td>'.$plugin[version].'</td>
+	<td>'.run_filters('plugin-description',$plugin[description]).'</td>
+	<td>'.($plugin[author_uri] ?  '<a href="'.$plugin[author_uri].'">'.$plugin[author].'</a>': $plugin[author]).'</td>
+	<td>'.($plugin[compatible] ? ($enabled ? '<a href="'.$querystring.'&amp;disable='.$id.'">Отключить</a>' : '<a href="'.$querystring.'&amp;enable='.$id.'">Включить</a>') : 'Несовместим').'</td>
+	</tr>';
+	}
+		
+	$buffer .= '</tbody></table>';
+	echo $buffer;
+	
+	echofooter();
+}
+// End plugins hack
+
+// ********************************************************************************
+// Show Personal Options
+// ********************************************************************************
+elseif($action == "personal")
+{
+    echoheader("user","Личные настройки");
+
+    $registrationdate = langdate("l, j M Y - h:i",$member_db[0]);    //registration date
+    if($member_db[7] == 1){ $ifchecked = "Checked"; }        //if user wants to hide his e-mail
+
+     foreach($member_db as $key=>$value){
+         $member_db[$key]  = stripslashes(preg_replace(array("'\"'", "'\''"), array("&quot;", "&#039;"),$member_db[$key]));
+     }
+
+     echo"
+     <table border=\"0\" height=\"1\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">
+     <form method=POST action=\"$PHP_SELF\" name=personal>
+     <td height=\"21\" bgcolor=#F7F6F4 >
+     &nbsp;&nbsp;Имя:
+     <td height=\"21\" width=\"400\" bgcolor=#F7F6F4 colspan=2>
+     $member_db[2]
+     <tr>
+     <td height=\"21\">
+     &nbsp;&nbsp;Новый пароль:
+     <td height=\"21\" width=\"400\" colspan=2>
+     <input name=editpassword >&nbsp;&nbsp;&nbsp;Если Вы хотите изменить текущий
+     </tr>
+
+     <tr>
+     <td height=\"21\" bgcolor=#F7F6F4>
+     &nbsp;&nbsp;Ник:
+     <td height=\"21\" width=\"400\" bgcolor=#F7F6F4 colspan=2>
+     <input type=text name=editnickname value=\"$member_db[4]\">
+     </tr>
+
+     <tr>
+     <td height=\"21\">
+     &nbsp;&nbsp;E-mail:
+     <td height=\"21\" width=\"400\"  colspan=2>
+     <input type=text name=editmail value=\"$member_db[5]\">&nbsp;&nbsp;&nbsp;<input type=checkbox name=edithidemail $ifchecked id=edithidemail style='border: 0px;'>&nbsp;<label for=edithidemail>Спрятать e-mail от посетителей</label>
+     </tr>";
+
+     if($member_db[1] != 4){echo"<tr>
+     <td height=\"21\" bgcolor=#F7F6F4>
+     &nbsp;&nbsp;Аватар:
+     <td height=\"21\" width=\"400\" bgcolor=#F7F6F4 >
+     <input type=text name=change_avatar value=\"$member_db[8]\">&nbsp;&nbsp;&nbsp;&nbsp;Будет появляться на странице новостей</tr>"; }else{ $bg = "bgcolor=#F7F6F4"; }
+
+     echo"<tr>
+     <td height=\"21\" $bg>
+     &nbsp;&nbsp;Уровень доступа:
+     <td height=\"21\" width=\"400\" $bg colspan=2>";
+
+     if        ($member_db[1] == 4){ echo "комментатор"; }
+     elseif    ($member_db[1] == 3){ echo "журналист"; }
+     elseif    ($member_db[1] == 2){ echo "редактор"; }
+     elseif    ($member_db[1] == 1){ echo "администратор"; }
+
+     if($member_db[1] != 4){ echo"</tr>
+     <tr>
+     <td height=\"21\" bgcolor=#F7F6F4>
+     &nbsp;&nbsp;Публикаций:
+     <td height=\"21\" width=\"400\" bgcolor=#F7F6F4 colspan=2>
+     $member_db[6]
+     </tr>"; }
+
+     echo"<tr>
+     <td height=\"21\" width=\"150\" >
+     &nbsp;&nbsp;Дата регистрации:
+     <td height=\"21\" width=\"400\"  colspan=2>
+     $registrationdate
+     </tr>
+     <tr>
+     <td height=\"1\" width=\"500\" colspan=\"2\" colspan=3>
+     <br /><input type=submit value=\"Сохранить\" accesskey=\"s\">
+     </tr>
+     <input type=hidden name=mod value=options>
+     <input type=hidden name=action value=dosavepersonal>
+     </form>
+     </table>";
+
+    echofooter();
+}
+// ********************************************************************************
+// Save Personal Options
+// ********************************************************************************
+elseif($action == "dosavepersonal")
+{
+
+function spostr_replace($field) {
+	$field = str_replace("\n", "", $field);
+	$field = str_replace("\r", "", $field);
+	$field = str_replace("|", "&#124;", $field);
+	return $field;
+}
+$editpassword = spostr_replace($editpassword);
+$editnickname = spostr_replace($editnickname);
+$edithidemail = spostr_replace($edithidemail);
+$editmail = spostr_replace($editmail);
+$change_avatar = spostr_replace($change_avatar);
+
+    if($edithidemail){ $edithidemail = 1;}else{ $edithidemail = 0; }
+
+    $avatars = preg_replace(array("'\|'","'\n'","' '"), array("","","_"), $avatars);
+
+    $old_user_db = file("./data/users.db.php");
+    $new_user_db = fopen("./data/users.db.php", w);
+    $personal_success = FALSE;
+    foreach($old_user_db as $old_user_db_line){
+        $old_user_db_arr = explode("|", $old_user_db_line);
+        if(strtolower($username) != strtolower($old_user_db_arr[2])){
+            fwrite($new_user_db,"$old_user_db_line");
+        }
+        else{
+            if($editpassword != ""){
+                $old_user_db_arr[3] = md5($editpassword);
+                if($config_use_cookies == TRUE){ setcookie("md5_password", $old_user_db_arr[3]); }
+                $_SESSION['md5_password'] = $old_user_db_arr[3];
+            }
+            fwrite($new_user_db,"$old_user_db_arr[0]|$old_user_db_arr[1]|$old_user_db_arr[2]|$old_user_db_arr[3]|$editnickname|$editmail|$old_user_db_arr[6]|$edithidemail|$change_avatar|$old_user_db_arr[9]||\n");
+             $personal_success = TRUE;
+        }
+    }
+    fclose($new_user_db);
+    if($personal_success){ msg("info", "Изменения сохранены", "Ваша персональная информация была успешно сохранена", "$PHP_SELF?mod=options&action=personal"); }
+    else{ msg("error", "Error !!!", "Ошибка в списке пользователей, пользователь $username не найден!", "$PHP_SELF?mod=options&action=personal"); }
+}
+// ********************************************************************************
+// Edit Templates
+// ********************************************************************************
+elseif($action == "templates")
+{
+    if($member_db[1] != 1){ msg("error", "Доступ отклонен", "Вы не имеете разрешения для этого типа действия"); }
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      Detect all template packs we have
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+        $templates_list = array();
+        if(!$handle = opendir("./data")){ die("<center>Невозможно открыть папку $cutepath/data "); }
+           while (false !== ($file = readdir($handle))){
+               if(eregi(".tpl", $file)){
+                $file_arr         = explode(".", $file);
+                $templates_list[]= $file_arr[0];
+               }
+           }
+        closedir($handle);
+
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      If we want to create new template
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    if($subaction == "new"){
+        echoheader("options", "Создание нового шаблона");
+
+        echo"<form method=post action=\"$PHP_SELF\"><table border=0 cellpading=0 cellspacing=0 width=100% height=100%><tr><td>Создать новый шаблон на базе: <select name=base_template>";
+        foreach($templates_list as $single_template){
+            echo "<option value=\"$single_template\">$single_template</option>";
+        }
+        echo '</select> с названием <input type=text name=template_name> &nbsp;<input type=submit value="Создать">
+        <input type=hidden name=mod value=options>
+        <input type=hidden name=action value=templates>
+        <input type=hidden name=subaction value=donew>
+        </td></tr></table></form>';
+        echofooter();
+        exit;
+    }
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      Do Create the new template
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    if($subaction == "donew"){
+        if(!eregi("^[a-z0-9_-]+$", $template_name)){ msg("error", "Ошибка!!!", "Название шаблона должно состоять только из букв и цифр!", "$PHP_SELF?mod=options&subaction=new&action=templates"); }
+        if(file_exists("./data/${template_name}.tpl")){ msg("error", "Ошибка!!!", "Шаблон с таким именем уже существует!", "$PHP_SELF?mod=options&subaction=new&action=templates"); }
+
+        if($base_template != ""){ $base_file = "./data/${base_template}.tpl"; }
+        else{ $base_file = "./data/Default.tpl"; }
+
+        if (!copy($base_file, "./data/${template_name}.tpl")) {
+            msg("error", "Ошибка!!!", "Невозможно скопировать файл $base_file с названием ${template_name}.tpl");
+        }
+        @chmod("./data/${template_name}.tpl", 0777);
+
+        msg("info", "Шаблон создан!", "Новый шаблон создан с именем <b>${template_name}</b><br>", "$PHP_SELF?mod=options&action=templates");
+    }
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      Deleting template, preparation
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    if($subaction == "delete"){
+        if(strtolower($do_template) == "default"){ msg("Error", "Ошибка!!!", "Вы не можете удалить шаблон, используемый по умолчанию!", "$PHP_SELF?mod=options&action=templates"); }
+        $msg = "<form method=post action=\"$PHP_SELF\">Вы действительно хотите удалить шаблон <b>$do_template</b>?<br><br>
+        <input type=submit value=\" Да, удалить шаблон \"> &nbsp;<input onClick=\"document.location='$PHP_SELF?mod=options&action=templates';\" type=button value=\"Отмена\">
+        <input type=hidden name=mod value=options>
+        <input type=hidden name=action value=templates>
+        <input type=hidden name=subaction value=dodelete>
+        <input type=hidden name=do_template value=\"$do_template\">
+        </form>";
+
+        msg("info", "Удаление шаблона", $msg);
+    }
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      DO Deleting template
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    if($subaction == "dodelete"){
+        if(strtolower($do_template) == "default"){ msg("Error", "Ошибка!!!", "Вы не можете удалить шаблон, используемый по умолчанию!", "$PHP_SELF?mod=options&action=templates"); }
+        $unlink = unlink("./data/${do_template}.tpl");
+        if(!$unlink){ msg("error", "Ошибка!!!", "Невозможно удалить шаблон ./data/${do_template}.tpl!"); }
+        else{ msg("info", "Шаблон удален", "Шаблон <b>${do_template}</b> был удален!", "$PHP_SELF?mod=options&action=templates"); }
+    }
+
+
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      Show The Template Manager
+     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    if($do_template == '' or !$do_template){
+        $do_template = 'Default';
+        $show_delete_link = '';
+    }elseif(strtolower($do_template) != 'default'){
+        $show_delete_link = "<a href=\"$PHP_SELF?action=templates&mod=options&subaction=delete&do_template=$do_template\">[удалить шаблон]</a>";
+    }
+    require("./data/${do_template}.tpl");
+
+
+
+    if(eregi("opera", $HTTP_USER_AGENT)){ $tr_hidden = ""; }
+    else{ $tr_hidden = " style='display:none'"; }
+
+
+    $templates_names = array("template_active", "template_comment", "template_form", "template_full", "template_prev_next");
+    foreach($templates_names as $template)
+    {
+        $$template = preg_replace("/</","&lt;",$$template);
+        $$template = preg_replace("/>/","&gt;",$$template);
+    }
+    echoheader("options","Шаблоны");
+
+    echo'<table border=0 cellpading=0 cellspacing=0 height="77" >
+    <tr>
+    <td width=373 height="75">
+    <b>Управление шаблонами</b>
+
+
+    <table border=0 cellpading=0 cellspacing=0 width=347  class="panel" height="50" >
+    <form method=get action="'.$PHP_SELF.'">
+    <tr>
+    <td width=126height="23">
+    &nbsp;Шаблон:
+    <td width=225height="23">
+    :&nbsp; <b>'.$do_template.'</b>
+    </tr>
+    <tr>
+    <td width=126 height="27">
+    &nbsp;Выбрать другой:
+    <td width=225 height="27">
+    :&nbsp; <select size=1 name=do_template>';
+
+    foreach($templates_list as $single_template){
+        if($single_template == $do_template){ echo"<option selected value=\"$single_template\">$single_template</option>"; }
+        else{ echo"<option value=\"$single_template\">$single_template</option>"; }
+    }
+
+    echo'</select>
+    <input type=submit value=Go>
+    </tr>
+    <tr>
+    <td width=351 height="25" colspan="2">
+    &nbsp;<a href="'.$PHP_SELF.'?mod=options&subaction=new&action=templates">[создать новый]</a>&nbsp;
+    '.$show_delete_link.'</tr>
+    <input type=hidden name=action value=templates><input type=hidden name=mod value=options>
+    </form>
+    </table>
+
+    <td width=268 height="75" align="center">
+  <!-- HELP -->
+   <table cellspacing="0" cellpadding="0">
+    <tr>
+      <td width="25" align=middle><img border="0" src="skins/images/help_small.gif"></td>
+      <td >&nbsp;<a onClick="javascript:Help(\'templates\')" href="#">Что такое шаблоны?</a></td>
+    </tr>
+   </table>
+  <!-- END HELP -->
+
+    </tr>
+    </table>
+    <img height=20 border=0 src="skins/images/blank.gif" width=1>
+    <br>
+    <b>Редактировать части шаблона:</b><table width="100%"><form method=post action="'.$PHP_SELF.'">
+
+<tr> <!- start active news -->
+    <td height="7"  bgcolor=#F7F6F4 colspan="2">
+    <b><a style="font-size:12px" href="javascript:ShowOrHide(\'active-news1\',\'active-news2\')">Краткое содержание</a></b>
+    </tr>
+    <tr id=\'active-news1\' '.$tr_hidden.'>
+    <td height="9" width="200" valign="top">
+    <b>{title}<br />
+    {avatar}<br />
+    {short-story}<br />
+    {full-story}<br />
+    {author}<br />
+    {date}<br />
+    [link] </b>и<b> [/link]<br />
+    [full-link] </b>и<b> [/full-link]<br />
+    [com-link] </b>и<b> [/com-link]<br />
+    {comments-num}<br />
+    {category}<br />
+    {category-icon}<br />
+    {views}<br />
+    [xfvalue_X]<br />
+    [xfgiven_X]</b> и <b>[xfvalue_X][/xfgiven_X]
+    <td height=\"9\"  valign=\"top\" width=430>
+    - Заголовок статьи<br />
+    - Показывать аватар<br />
+    - Краткая версия новости<br />
+    - Полная версия<br />
+    - Автор статьи<br />
+    - Дата публикации<br />
+    - Позволяет создать постоянную ссылку на полную версию<br />
+    - Ссылка на полную версию (с каким-то условием)<br />
+    - Ссылка на комментарии к статье<br />
+    - Позволяет отображать количество комментариев к статье<br />
+    - Категория, к которой относится статья<br />
+    - Показывать иконку категории<br />
+    - Количество просмотров статьи<br />
+    - Значение дополнительного поля "X"<br />
+    - Текст: &lt;дополнительное поле "X"&gt;, если поле не пустое
+    </tr>
+    <tr id=\'active-news2\' '.$tr_hidden.'>
+    <td height="8"  colspan="2">
+    <textarea rows="9" cols="98" name="edit_active">'.$template_active.'</textarea>
+    <br />
+    &nbsp;
+</tr> <!-- End active news -->
+
+<tr> <!-- Start full story -->
+    <td height="7"  bgcolor=#F7F6F4 colspan="2">
+    <b><a style="font-size:12px" href="javascript:ShowOrHide(\'full-story1\',\'full-story2\')" >Статья целиком</a></b>
+    </tr>
+    <tr id=\'full-story1\' '.$tr_hidden.'>
+    <td height="9" width="200" valign="top">
+    <b> {title}<br />
+    {avatar}<br />
+    {full-story}<br />
+    {short-story}</b><b><br />
+    {author}<br />
+    {date}<br />
+    {comments-num}<br />
+    {category}<br />
+    {category-icon}<br />
+    [print-link]</b> и <b>[/print-link]<br />
+    [comheader]</b> и <b>[/comheader]</b>
+    <td height=\"9\"  valign=\"top\">
+    - Заголовок статьи<br />
+    - Показывать аватар<br />
+    - Полная версия<br />
+    - Краткая версия новости<br />
+    - Автор статьи<br />
+    - Дата публикации<br />
+    - Позволяет отображать количество комментариев к статье<br />
+    - Категория, к которой относится статья<br />
+    - Показывать иконку категории<br />
+    - Ссылка на версию для печати<br />
+    - Выводит надпись для комментариев только если они разрешены
+    </tr>
+    <tr id=\'full-story2\' '.$tr_hidden.'>
+    <td height="8"  colspan="2">
+    <textarea rows="9" cols="98" name="edit_full">'.$template_full.'</textarea>
+    <br />
+    &nbsp;
+</tr> <!-- End full story -->
+
+<tr> <!-- Start comment -->
+    <td height="7"  bgcolor=#F7F6F4 colspan="2">
+    <b><a style="font-size:12px" href="javascript:ShowOrHide(\'comment1\',\'comment2\')" >Комментарий</a></b>
+    </tr>
+    <tr id=\'comment1\' '.$tr_hidden.'>
+    <td height="9" width="200" valign="top">
+    <b>{author}<br />
+    {mail}<br />
+    {date}<br />
+    {comment}<br />
+    {comment-id}<br />
+    {comnum}<br />
+    {alternating}</b>
+    <td height=\"9\"  valign=\"top\">
+    - Имя человека, оставившего комментарий<br />
+    - Его е-mail<br />
+    - Дата публикации комментария<br />
+    - Текст комментария<br />
+    - Идентификационный номер комментария<br />
+    - Порядковый номер комментария<br />
+    - Изменение вида комментариев при чередовании (CSS стили: cn_comment_odd или cn_comment_even)
+    </tr>
+    <tr id=\'comment2\' '.$tr_hidden.'>
+    <td height="8"  colspan="2">
+    <textarea rows="9" cols="98" name="edit_comment">'.$template_comment.'</textarea>
+    <br />
+    &nbsp;
+</tr> <!-- End comment -->
+
+<tr> <!-- Start add comment form -->
+    <td height="7"  bgcolor=#F7F6F4 colspan="2">
+    <b><a style="font-size:12px" href="javascript:ShowOrHide(\'add-comment-form1\',\'add-comment-form2\')" >Форма добавления комментария</a></b>
+    </tr>
+    <tr id=\'add-comment-form1\' '.$tr_hidden.'>
+    <td height="9" width="1094" valign="top" colspan="2">
+    Пожалуйста не редактируйте эту часть, если не знаете HTML!!!<br />
+    Переменные для вывода значений в формах, при выбранной опции "Запомнить меня?"<br /><br />
+    <b>{savedname}</b> - сохраненное в cookie имя пользователя<br />
+    <b>{savedmail}</b> - сохраненный в cookie e-mail пользователя<br />
+    <b>{remember}</b> - вывод опции "Запомнить меня?"<br />
+    </tr>
+    <tr id=\'add-comment-form2\' '.$tr_hidden.'>
+    <td height="8"  colspan="2">
+    <textarea rows="9" cols="98" name="edit_form">'.$template_form.'</textarea>
+    <br />
+    &nbsp;
+</tr> <!-- End add comment form -->
+
+<tr> <!-- Start previous & next -->
+    <td height="7"  bgcolor=#F7F6F4 colspan="2">
+    <b><a style="font-size:12px" href="javascript:ShowOrHide(\'previous-next1\',\'previous-next2\')" >Предыдущая и следующая страницы для новостей</a></b>
+    </tr>
+    <tr id=\'previous-next1\' '.$tr_hidden.'>
+    <td height="9" width="200" valign="top">
+    <b> [prev-link] </b>and<b> [/prev-link]<br />
+    [next-link] </b>and<b> [/next-link]<br />
+    {pages}<br />
+    {current-page}<br />
+    {total-pages}
+    <td height="9" valign="top">
+    - Создает ссылку на предыдущую страницу (если такая есть)<br />
+    - Создает ссылку на следующую страницу (если такая есть)<br />
+    - Создает ссылки на страницы; например: <a href=\'#\'>1</a> <a href=\'#\'>2</a> <a href=\'#\'>3</a> <a href=\'#\'>4</a><br />
+    - Выводит номер текущей страницы<br />
+    - Выводит общее кол-во страниц
+    </tr>
+
+    <tr id=\'previous-next2\' '.$tr_hidden.'>
+    <td height="8"  colspan="2">
+    <textarea rows="3" cols="98" name="edit_prev_next">'.$template_prev_next.'</textarea>
+</tr> <!-- End previous & next -->
+
+
+<tr> <!-- Start previous & next for comments -->
+    <td height="7" bgcolor=#F7F6F4 colspan="2">
+    <b><a style="font-size:12px" href="javascript:ShowOrHide(\'previous-next-com1\',\'previous-next-com2\')" >Предыдущая и следующая страницы для комментариев</a></b>
+    </tr>
+    <tr id=\'previous-next-com1\' '.$tr_hidden.'>
+    <td height="9" width="200" valign="top">
+    <b> [prev-link] </b>and<b> [/prev-link]<br />
+    [next-link] </b>and<b> [/next-link]<br />
+    {pages}<br />
+    <td height="9"  valign="top">
+    - Создает ссылку на предыдущую страницу (если такая есть)<br />
+    - Создает ссылку на следующую страницу (если такая есть)<br />
+    - Создает ссылки на страницы; например: <a href=\'#\'>1</a> <a href=\'#\'>2</a> <a href=\'#\'>3</a> <a href=\'#\'>4</a>
+    </tr>
+
+    <tr id=\'previous-next-com2\' '.$tr_hidden.'>
+    <td height="8"  colspan="2">
+    <textarea rows="3" cols="98" name="edit_сprev_next">'.$template_cprev_next.'</textarea>
+</tr> <!-- End previous & next for comments -->
+
+
+<tr> <!-- Start dateheader -->
+    <td height="7"  bgcolor=#F7F6F4 colspan="2">
+    <b><a style="font-size:12px" href="javascript:ShowOrHide(\'dateheader1\',\'dateheader2\')" >Вывод даты</a></b>
+    </tr>
+    <tr id=\'dateheader1\' '.$tr_hidden.'>
+    <td height="9" width="200" valign="top">
+    <b>{dateheader}</b>
+    <td height="9"  valign="top">
+    - Групповой вывод даты на несколько новостей за один день
+    </tr>
+
+    <tr id=\'dateheader2\' '.$tr_hidden.'>
+    <td height="8"  colspan="2">
+    <textarea rows="3" cols="98" name="edit_dateheader">'.$template_dateheader.'</textarea>
+</tr> <!-- End dateheader --> 
+
+<tr>
+    <td height="8"  colspan="2">
+    <input type=hidden name=mod value=options>
+    <input type=hidden name=action value=dosavetemplates>
+    <input type=hidden name=do_template value="'.$do_template.'">
+    <br /><input type=submit value="   Сохранить   " accesskey="s">
+    </tr></form>
+    </table>';
+
+    echofooter();
+}
+// ********************************************************************************
+// Do Save Changes to Templates
+// ********************************************************************************
+elseif($action == "dosavetemplates")
+{
+   	if($member_db[1] != 1){ msg("error", "Access Denied", "You don't have permissions for this type of action"); }
+    $templates_names = array("edit_active", "edit_comment", "edit_form", "edit_full", "edit_prev_next", "edit_сprev_next", "edit_dateheader");
+    foreach($templates_names as $template)
+    {
+		$$template = stripslashes($$template);
+    }
+
+    if($do_template == "" or !$do_template){ $do_template = "Default"; }
+    $template_file = "./data/${do_template}.tpl";
+
+	$handle = fopen("$template_file","w");
+    fwrite($handle, "<?PHP\n///////////////////// TEMPLATE $do_template /////////////////////\n");
+    fwrite($handle, "\$template_active = <<<HTML\n$edit_active\nHTML;\n\n\n");
+	fwrite($handle, "\$template_full = <<<HTML\n$edit_full\nHTML;\n\n\n");
+    fwrite($handle, "\$template_comment = <<<HTML\n$edit_comment\nHTML;\n\n\n");
+    fwrite($handle, "\$template_form = <<<HTML\n$edit_form\nHTML;\n\n\n");
+    fwrite($handle, "\$template_prev_next = <<<HTML\n$edit_prev_next\nHTML;\n\n\n");
+    fwrite($handle, "\$template_cprev_next = <<<HTML\n$edit_сprev_next\nHTML;\n\n\n");
+    fwrite($handle, "\$template_dateheader = <<<HTML\n$edit_dateheader\nHTML;\n\n\n");
+    fwrite($handle, "?>\n"); 
+
+    msg("info","Изменения сохранены","Шаблон успешно сохранен","$PHP_SELF?mod=options&action=templates&do_template=$do_template");
+}
+
+// ********************************************************************************
+// System Configuration
+// ********************************************************************************
+elseif($action == "syscon")
+{
+    echoheader("options", "Настройка системы");
+
+    function showRow($title="", $description="", $field="")
+    {
+        global $i;
+        if( $i%2 == 0 and $title != ""){ $bg = "bgcolor=#F7F6F4"; }
+        echo"<tr $bg>
+        <td colspan=2 style=\"padding:4\">
+        &nbsp;<b>$title</b>
+        <td width=294 rowspan=2 valign=middle align=middle>
+        $field<br />&nbsp;
+        </tr>
+        <tr $bg>
+        <td height=15 width=27 style=\"padding:4\">
+        &nbsp;
+        <td height=15 width=299 valign=top>
+        <font color=#808080>$description</font>
+        </tr>";
+        $bg = ""; $i++;
+    }
+    function makeDropDown($options, $name, $selected)
+    {
+        $output = "<select size=1 name=\"$name\">\r\n";
+        foreach($options as $value=>$description)
+        {
+          $output .= "<option value=\"$value\"";
+          if($selected == $value){ $output .= " selected "; }
+          $output .= ">$description</option>\n";
+        }
+        $output .= "</select>";
+        return $output;
+    }
+
+
+    echo"<table border=0 cellpading=0 cellspacing=0 width=654  ><form action=\"$PHP_SELF\" method=post>";
+
+    if(!$handle = opendir("./skins")){ die("Невозможно открыть директорию ./skins "); }
+    while (false !== ($file = readdir($handle))) {
+        $file_arr = explode(".",$file);
+        if($file_arr[1] == "skin"){
+            $sys_con_skins_arr[$file_arr[0]] = $file_arr[0];
+        }elseif($file_arr[1] == "lang"){
+            $sys_con_langs_arr[$file_arr[0]] = $file_arr[0];
+        }
+    }
+    closedir($handle);
+
+    showRow("Полный путь к директории CuteNews:", "например: http://yoursite.com/cutenews", "<input type=text style=\"text-align: center;\"  name='save_con[http_script_dir]' value='$config_http_script_dir' size=40>");
+
+    showRow("Домашняя страница сайта:", "например: http://yoursite.com/news.php", "<input type=text style=\"text-align: center;\" name='save_con[http_home_url]' value='$config_http_home_url' size=40>", "Yes");
+
+    showRow("Версия для печати:", "например: http://yoursite.com/print.php", "<input type=text style=\"text-align: center;\" name='save_con[http_print_url]' value='$config_http_print_url' size=40>", "Yes");
+
+    showRow("Название сайта:", "например: \"Русский сайт CuteNews\"", "<input type=text style=\"text-align: center;\" name='save_con[home_title]' value='$config_home_title' size=40>", "Yes");
+
+    showRow("Уведомления о новых комментариях:", "отсылка комментариев на Ваш e-mail", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[send_mail_upon_posting]", "$config_send_mail_upon_posting"));
+
+    showRow("E-mail для уведомлений:", "e-mail на который присылать уведомления", "<input type=text style=\"text-align: center;\" name='save_con[admin_mail]' value='$config_admin_mail' size=40>", "Yes");
+
+    showRow("Скины CuteNews:", "выбирите скин для АдминЦентра", makeDropDown($sys_con_skins_arr, "save_con[skin]", "$config_skin"));
+
+    showRow("Автоматическое урезание комментариев:", "в случае превышения заданного числа символов", "<input type=text style=\"text-align: center;\"  name='save_con[auto_wrap]' value=\"$config_auto_wrap\" size=10>");
+
+    showRow("Защита от флуда:", "указывается в секундах; 0 = защиты нет", "<input type=text style=\"text-align: center;\"  name='save_con[flood_time]' value=\"$config_flood_time\" size=10>");
+
+    showRow("Смайлики:", "разделяются запятыми (<b>,</b>)", "<input type=text style=\"text-align: center;\"  name='save_con[smilies]' value=\"$config_smilies\" size=40>");
+
+    showRow("Коррекция временных зон:", "в минутах; т.е.: <b>180</b>=+3 часа; <b>-120</b>=-2 часа", "<input type=text style=\"text-align: center;\"  name='save_con[date_adjust]' value=\"$config_date_adjust\" size=10>");
+
+    showRow("Использовать аватары:", "Нет - поле URL аватара не будет отображаться", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[use_avatar]", "$config_use_avatar"));
+
+    showRow("Порядок комментариев:", "Да - новые комментарии будут вверху", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[reverse_comments]", "$config_reverse_comments"));
+
+    showRow("Порядок новостей:", "Да - старые новости будут вверху", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[reverse_active]", "$config_reverse_active"));
+
+    // Date Header Configs
+
+    showRow("Групповой вывод даты:", "Вывод даты на несколько новостей за один день", makeDropDown(array("Yes"=>"Да","No"=>"Нет"), "save_con[date_header]", "$config_date_header"), "Yes"); 
+
+    showRow("Формат даты при групповом выводе:", "<a onClick=\"javascript:Help('date')\" href=\"#\">помощь по работе функции</a>", "<input type=text style=\"text-align: center;\"  name='save_con[date_headerformat]' value='$config_date_headerformat' size=40>", "Yes"); 
+
+    // Full Story Configs
+
+    showRow("Отображение комментариев:", "Да - комментарии будут отображаться под полной версией новости, в том же окне", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[show_comments_with_full]", "$config_show_comments_with_full"));
+
+    showRow("Формат времени для новостей:", "<a onClick=\"javascript:Help('date')\" href=\"#\">помощь по работе функции</a>", "<input type=text style=\"text-align: center;\"  name='save_con[timestamp_active]' value='$config_timestamp_active' size=40>");
+
+    showRow("Статьи целиком в отдельном окне:", "для полной версии открывается новое окно", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[full_popup]", "$config_full_popup"));
+
+    showRow("Настройки окна для статьи целиком:", "если 'Статьи целиком в отдельном окне' - вкл.", "<input type=text style=\"text-align: center;\"  name='save_con[full_popup_string]' value=\"$config_full_popup_string\" size=40>");
+
+    // COMMENTS Configs
+
+    showRow("Деление комментариев на страницы", "разрешить разделение комментариев на страницы", makeDropDown(array("Yes"=>"Да","No"=>"Нет"), "save_con[comments_pagination]", "$config_comments_pagination"), "Yes");
+
+    showRow("Комментариев на странице", "сколько показывать комментариев на одной странице?", "<input type=text style=\"text-align: center;\"  name='save_con[comments_pagination_number]' value='$config_comments_pagination_number' size=3>", "Yes"); 
+
+    showRow("Комментарии для зарегистрированных:", "Да - комментировать могут только зарегистрированные пользователи", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[only_registered_comment]", "$config_only_registered_comment"));
+
+    showRow("Использовать поле e-mail как URL", "пользователь может оставлять адрес сайта вместо e-mail", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[allow_url_instead_mail]", "$config_allow_url_instead_mail"));
+
+    showRow("Отображение полной версии:", "Да - комментарии будут отображаться под полной версией новости, в том же окне", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[show_full_with_comments]", "$config_show_full_with_comments"));
+
+    showRow("Формат времени для комментариев:", "<a onClick=\"javascript:Help('date')\" href=\"#\">помощь по работе функции</a>", "<input type=text style=\"text-align: center;\" name='save_con[timestamp_comment]' value='$config_timestamp_comment' size=40>");
+    
+    showRow("Комментарии в отдельном окне:", "для комментариев окрывается новое окно", makeDropDown(array("yes"=>"Да","no"=>"Нет"), "save_con[comments_popup]", "$config_comments_popup"));
+
+    showRow("Настройки окна для комментариев:", "если 'Комментарии в отдельном окне' - вкл.", "<input type=text style=\"text-align: center;\"  name=\"save_con[comments_popup_string]\" value=\"$config_comments_popup_string\" size=40>");
+
+    echo"
+    <input type=hidden name=mod value=options>
+    <input type=hidden name=action value=dosavesyscon>".
+    showRow("","","<br /><input type=submit value=\"     Сохранить    \" accesskey=\"s\">")."
+    </form></table>";
+    echofooter();
+}
+// ********************************************************************************
+// Save System Configuration
+// ********************************************************************************
+elseif($action == "dosavesyscon")
+{
+    if($member_db[1] != 1){ msg("error", "Доступ запрещен", "Вы не можете юзать этот раздел"); }
+    $handler = fopen("./data/config.php", "w");
+    fwrite($handler, "<?PHP \n\n//System Configurations\n\n\$config_version_name = \"$config_version_name\";\n\n\$config_version_id = \"$config_version_id\";\n\n");
+    foreach($save_con as $name=>$value)
+    {
+    fwrite($handler, "\$config_$name = \"$value\";\n\n");
+    }
+    fwrite($handler, "?>");
+    fclose($handler);
+
+    include("./skins/".$save_con["skin"].".skin.php");
+    msg("info", "Настройки сохранены", "Настройки системы были успешно сохранены");
+}
+
+else {
+	run_actions('plugin-options');
+}
+
+?>

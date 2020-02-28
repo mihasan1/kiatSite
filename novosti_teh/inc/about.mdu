@@ -1,0 +1,131 @@
+<?PHP
+
+// ********************************************************************************
+// CuteCode
+// ********************************************************************************
+if($action == "cutecode")
+{
+echo"<html><head><title>Тэги</title>
+<style type=\"text/css\">
+<!--
+BODY, TD {text-decoration: none; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt;}
+a:active,a:visited,a:link {color: #446488; text-decoration: none; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 8pt;}
+a:hover {font-size : 8pt; color: #000000; font-family: verdana; text-decoration: none; }
+form { display: inline; }
+-->
+</style></head><body bgcolor=#FFFFFF>
+<script language=\"javascript\" type=\"text/javascript\">
+<!--
+function insertcode(type,var1,var2) {
+if(var1 != null){
+if(var2 == null){ var2='  '; }
+switch(type) {
+case 'link':
+code = '<a href=\"' +var1+ '\">' +var2+ '</a>';
+break;
+case 'image':
+code = '<img src=\"' +var1+ '\" alt=\"\" style=\"border: none;\" />';
+break;
+case 'bold':
+code = '<strong>' +var1+ '</strong>';
+break;
+case 'italic':
+code = '<em>' +var1+ '</em>';
+break;
+case 'underline':
+code = '<span style=\"text-decoration: underline;\">' +var1+ '</span>';
+break;
+case 'color':
+code = '<span style=\"color: ' +var1+ '\">' +var2+ '</span>';
+break;
+case 'size':
+code = '<span style=\"font-size: ' +var1+ 'pt\">' +var2+ '</span>';
+break;
+case 'font':
+code = '<span style=\"font-family: ' +var1+ '\">' +var2+ '</span>';
+break;
+case 'align':
+code = '<div style=\"text-align: ' +var1+ '\">' +var2+ '</div>';
+break;
+case 'quote':
+code = '[quote]' +var1+ '[/quote]';
+break;
+case 'list':
+code = '<ul>\\n<li>Text1</li>\\n<li>Text2</li>\\n<li>Text3</li>\\n</ul>';
+alert('Простой пример списка будет вставлен в форму');
+break;
+default:
+}
+code = ' ' + code + ' ';
+opener.document.addnews.$target.value  += code;
+if(document.my.ifClose.checked == true)
+{
+opener.document.addnews.$target.focus();
+window.close();
+opener.document.addnews.$target.focus();
+}
+}
+}
+//-->
+</script>
+<table border=0 height=247 width=320 cellspacing=0 cellpadding=0>
+
+<td height=15 colspan=2 width=21><td height=15 width=342><tr><td height=15 colspan=2 width=367><font size=2 face=Verdana><b>Быстрый ввод тэгов</b></font><td height=15 width=0></tr><tr bgcolor=#F7F6F4><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('link', prompt('Введите URL', 'http://'), prompt('Описание ссылки', '') )\">Ссылка</a><td height=16 width=0>[link=<font color=#808080>URL</font>]<font color=#808080>Текст</font>[/link]</tr><tr ><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('image', prompt('Ссылка на картинку:', 'http://') )\">Картинка</a><td height=16 width=0>[image=<font color=#808080>URL</font>]</tr><tr bgcolor=#F7F6F4><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('quote', prompt('Текст для цитирования:', '') )\">Цитата</a><td height=16 width=0>[quote=<font color=#808080>Name</font>]<font color=#808080>Текст</font>[/quote]</tr><tr ><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('list', 'none' )\">Список</a><td height=16 width=0>[list]<font color=#808080>[*]Т1[*]Т2</font>[/list]</tr><tr bgcolor=#F7F6F4><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('bold', prompt('Ваш текст', '') )\">Жирный</a><td height=16 width=0>[b]<font color=#808080>Текст</font>[/b]</tr><tr ><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('italic', prompt('Ваш текст', '') )\">Наклонный</a><td height=16 width=0>[i]<font color=#808080>Текст</font>[/i]</tr><tr bgcolor=#F7F6F4><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('underline', prompt('Ваш текст', '') )\">Подчеркнутый</a><td height=16 width=0>[u]<font color=#808080>Текст</font>[/u]</tr><tr><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('color', prompt('Введите цвет текста (blue, red, green, fuchsia)',''), prompt('Ваш текст','') )\">Цвет</a><td height=16 width=0>[color=<font color=#808080>COLOR</font>]<font color=#808080>Текст</font>[/color]</tr><tr bgcolor=#F7F6F4><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('size', prompt('Введите размер текста (цифровой)',''), prompt('Ваш текст','') )\">Размер</a><td height=16 width=0>[size=<font color=#808080>SIZE</font>]<font color=#808080>Текст</font>[/size]</tr><tr><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('font', prompt('Введите вид шрифта (verdana, arial, times, courier)',''), prompt('Ваш текст','') )\">Шрифт</a><td height=16 width=0>[font=<font color=#808080>FONT</font>]<font color=#808080>Текст</font>[/font]</tr><tr bgcolor=#F7F6F4><td height=16 width=21>&nbsp;
+
+<td height=16 width=344><a href=\"javascript:insertcode('align', prompt('Введите вид выравнивания (right, left, center, justify)',''), prompt('Ваш текст','') )\">Выравнивание</a>
+<td height=16 width=0>
+[align=<font color=#808080>ALIGN</font>]<font color=#808080>Текст</font>[/align]
+</tr><tr><td width=21 height=57>
+&nbsp;<form name=my><td height=57 colspan=2 width=342><input type=checkbox checked name=ifClose id=close><label for=close> Закрыть окно</label></tr></form></table></body></HTML>";}
+else{
+echoheader("question", "Помощь");
+
+echo <<<HTML
+
+<table border=0 cellpading=0 cellspacing=0 width=654>
+<tr><td width=650 valign=middle height=1 bgcolor=#F7F6F4 colspan=3>&nbsp; <font size=2><b>Помощь и поддержка</b></font>&nbsp;</tr>
+<tr><td width=31 valign=middle height=70>
+&nbsp;&nbsp;<td width=619 valign=middle colspan=2 align=justify><br>Если у вас возникнут какие-либо вопросы по CuteNews, заходите на <a href=http://cutephp.com/forum/ target=_blank>официальный форум</a>.<br>
+Но перед тем, как публиковать свой вопрос на форуме, ознакомьтесь с <a style="font-size: 11px; letter-spacing: 0.2pt; font-weight: bold;" href=$PHP_SELF?mod=help>документацией по CuteNews</a>, входящей в систему.<br><br>
+Также свои вопросы Вы можете задавать на <b><a href=http://ultra-music.com/forum/topic.php?forum=6 target=_blank>форуме</a></b> для русскоязычных пользователей CuteNews.<br><br>
+Новую версию скрипта как всегда можно найти на <b><a href=http://cutenews.ru/ target=_blank>русском сайте CuteNews</a></b>.</tr>
+<tr><td>&nbsp;</td></tr>
+
+<tr><td width=650 valign=middle height=1 bgcolor=#F7F6F4 colspan=3>&nbsp; <font size=2><b>Автопроверка</b></font>&nbsp;</tr>
+<tr><td width=31 valign=middle height=70>
+&nbsp;&nbsp;<td width=619 valign=middle colspan=2 align=justify><br>
+Здесь происходит автоматическая проверка новых версий скрипта. Последняя версия, как всегда, доступна на русском сайте <a href="http://cutenews.ru/" target="_blank">CuteNews</a>.
+
+<table border=0 cellpading=0 cellspacing=0 width=400>
+<script language=JavaScript>r=""+Math.random()+"&pg="+escape(window.location.href)+"&version=$config_version_id";
+document.write("<img src='http://cutenews.ru/check.php?id="+r+"' border=0 width=1 height=1>")</script> 
+<tr><td width=300><b>Используемая версия:</b></td><td>$config_version_name $config_version_id</td></tr>
+<tr><td><b>Последняя доступная версия:</b></td><td width=250><script language=JavaScript src="http://cutenews.ru/version.php"></script></tr>
+</table> 
+
+</tr>
+<tr><td>&nbsp;</td></tr></table>
+HTML;
+echofooter();
+}
+?>
