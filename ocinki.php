@@ -34,7 +34,7 @@ var TMenu_path_to_files="includes/javascript/hovermenu/";
 <td class="logo_uvaf"><img src="skins/uvaf/images/logo.jpg" width="961" height="180" align="middle" /></td>
 </tr>
 <tr>
-<td class="toolbar_uvaf"><center><table border="0" cellpadding="0" cellspacing="0"><tr><td width="3" class="bullet_10"></td><td width="80" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="index.php" class="sdcategory" target="_self">Головна</a></div></td></tr></table></td><td width="76" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td width="77" align="center" class="bullet_4"><div class="bullet_5"><a href="istoriya_1920-1947.php" class="sdcategory" target="_self">Історія</a></div></td></tr></table></td><td width="94" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="pam.php" class="sdcategory" target="_self">Абітурієнту</a></div></td></tr></table></td><td width="82" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="student.php" class="sdcategory" target="_self">Студенту</a></div></td></tr></table></td><!--<td width="82" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="forum/" class="sdcategory" target="_self">Форум</a></div></td></tr></table></td>--><td width="80" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="forum/index.php?autocom=gallery" class="sdcategory" target="_self">Галерея</a></div></td></tr></table></td><td width="106" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table width="106" border="0" cellpadding="0" cellspacing="0">
+<td class="toolbar_uvaf"><center><table border="0" cellpadding="0" cellspacing="0"><tr><td width="3" class="bullet_10"></td><td width="80" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="index.php" class="sdcategory" target="_self">Головна</a></div></td></tr></table></td><td width="76" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td width="77" align="center" class="bullet_4"><div class="bullet_5"><a href="istoriya_1920-1947.php" class="sdcategory" target="_self">Історія</a></div></td></tr></table></td><td width="94" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="pam.php" class="sdcategory" target="_self">Абітурієнту</a></div></td></tr></table></td><td width="82" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="student.php" class="sdcategory" target="_self">Студенту</a></div></td></tr></table></td><td width="82" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="forum/" class="sdcategory" target="_self">Форум</a></div></td></tr></table></td><td width="80" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table border="0" cellpadding="0" cellspacing="0"><tr><td align="center" class="bullet_4"><div class="bullet_5"><a href="forum/index.php?autocom=gallery" class="sdcategory" target="_self">Галерея</a></div></td></tr></table></td><td width="106" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table width="106" border="0" cellpadding="0" cellspacing="0">
 <tr><td width="106" align="center" class="bullet_4"><div class="bullet_5"><a href="forum/index.php?autocom=downloads" class="sdcategory" target="_self">Завантажити</a></div></td></tr></table></td><td width="101" class="bullet_8_default" onMouseOver="this.className='bullet_8_hover'" onMouseOut="this.className='bullet_8_default'"><table width="101" border="0" cellpadding="0" cellspacing="0">
 <tr><td width="101" align="center" class="bullet_4"><div class="bullet_5"><a href="kont.php" class="sdcategory" target="_self">Контакти</a></div></td></tr></table></td></tr></table>
 </center></td>
@@ -130,18 +130,17 @@ var TMenu_path_to_files="includes/javascript/hovermenu/";
 
 <form>
 <table cellspacing=4><tr><td>
-<input type="button" class="button" name="btnSubmit" value="Вступні іспити" onclick="javascript: document.location='ocinki.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
+<input type="button" class="button" name="btnSubmit" value="Пам ятка абітурієнту" onclick="javascript: document.location='pam.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
 </td></tr><tr><td>
-<input name="btnSubmit" type="button" class="button" onclick="javascript: document.location='student.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" value="Права та обов’язки студентів" />
+<input type="button" class="button" name="btnSubmit" value="Правила прийому" onclick="javascript: document.location='pravila_priema.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
 </td></tr><tr><td>
-<input type="button" class="button" name="btnSubmit" value="Модулі" onclick="javascript: document.location='student_po.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
+<input type="button" class="button" name="btnSubmit" value="Положення про прийм.ком." onclick="javascript: document.location='perelik.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
 </td></tr><tr><td>
-<input type="button" class="button" name="btnSubmit" value="Розклад занять" onclick="javascript: document.location='student_roz.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
+<input type="button" class="button" name="btnSubmit" value="Зарахування" onclick="javascript: document.location='ekzam.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
 </td></tr><tr><td>
-<input type="button" class="button" name="btnSubmit" value="Студентський актив" onclick="javascript: document.location='student_star.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
+<input type="button" class="button" name="btnSubmit" value="Наші сертифікати" onclick="javascript: document.location='sertifikat.php';" onmouseover="javascript:this.style.backgroundColor='#D2D2FF';" onmouseout="javascript:this.style.backgroundColor='#ffffff';" />
+</td></tr></table>
 
-</td></tr><tr><td>
-</table>
 </form>
 </tr>
 </table>
@@ -198,9 +197,9 @@ include($p_path."form.php");
 <tr>
 <td class="toolbar_general_2"><div class="toolbar_text_2">
 
-<p align="left"><span class="стиль7"><strong><a href="includes\ocinki.docx">Завантажити оцінки</a></strong></span></p>
+<p align="left"><span class="стиль7"><strong><a href="includes\ocinki.doc">Завантажити оцінки</a></strong></span></p>
 
-<p align="left"><span class="стиль7"><strong><a href="includes\Ocenki.docx">Оцінки</a></strong></span></p>
+
 
 
 
